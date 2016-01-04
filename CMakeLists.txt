@@ -18,7 +18,7 @@ set (CMAKE_MODULE_PATH
 cmake_policy(SET CMP0002 OLD)
 
 # Find the required Libaries
-find_package (Qt5 REQUIRED CONFIG COMPONENTS Widgets Core DBus Network)
+find_package (Qt5 REQUIRED CONFIG COMPONENTS Widgets Core)
 find_package (KF5 REQUIRED COMPONENTS I18n Service Runner Wallet)
 
 include(KDEInstallDirs)
