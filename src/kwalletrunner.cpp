@@ -20,9 +20,6 @@
 #include "kwalletrunner.h"
 
 #include <QDebug>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QStandardPaths>
 #include <KLocalizedString>
 
 #include "entrydialog.h"
