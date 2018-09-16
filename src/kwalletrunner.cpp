@@ -21,6 +21,8 @@
 
 #include <QDebug>
 #include <KLocalizedString>
+#include <KNotifications/KNotification>
+#include <KShell>
 
 #include "entrydialog.h"
 
@@ -29,10 +31,11 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args):
 {
     Q_UNUSED(args);
 
-    setObjectName(QLatin1String("KWallet Runner"));
+    setObjectName(QLatin1String("KWallet"));
 
     // Add the syntax
     addSyntax(Plasma::RunnerSyntax(QLatin1String("kwallet :q:"), i18n("Finds all KWallet entries matching :q:")));
+    addSyntax(Plasma::RunnerSyntax(QLatin1String("kwallet-add :q:"), i18n("Add an entry using syntax: entryName username=\"your_username\" password=\"pass\"")));
     
     // Open the wallet
     m_wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
@@ -62,7 +65,6 @@ void KWalletRunner::match(Plasma::RunnerContext &context)
                 
                 // If there's no search term or the entry contains the search term...
                 if (!searchTerm.length() || entryName.contains(searchTerm)) {
-                
                     // ... add it to the list of results
                     Plasma::QueryMatch match(this);
                     match.setType(Plasma::QueryMatch::ExactMatch);
@@ -73,6 +75,33 @@ void KWalletRunner::match(Plasma::RunnerContext &context)
             }
         }
     }
+    
+    // KWallet Add
+    if (context.isValid() && context.query().startsWith(QLatin1String("kwallet-add "), Qt::CaseInsensitive)) {
+        // Get a list of the arguments  
+        KShell::Errors splitArgsError;
+        QStringList arguments = KShell::splitArgs(context.query(), KShell::AbortOnMeta, &splitArgsError);
+        
+        // If the arguments could not be split, abort
+        if (splitArgsError != KShell::Errors::NoError) {
+            return;
+        }
+        
+        // Pop the first "kwallet-add" from the list of arguments
+        arguments.pop_front();
+        
+        // If there's at least two arguments
+        if (arguments.length() >= 2) {
+            // Show option to open OneTimePass
+            Plasma::QueryMatch newAction(this);
+            newAction.setId("add");
+            newAction.setType(Plasma::QueryMatch::HelperMatch);
+            newAction.setIconName("kwallet");
+            newAction.setText("Add entry for "+arguments[0]);
+            newAction.setData(context.query());
+            context.addMatch(newAction);
+        }
+    }
 }
 
 
@@ -80,14 +109,58 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
 {
     Q_UNUSED(context)
     
-    QString folder = match.subtext();
-    QString entry = match.text();
+    // If we are adding an entry
+    if (match.type() == Plasma::QueryMatch::HelperMatch) {
+        // Get a list of the arguments  
+        KShell::Errors splitArgsError;
+        QStringList arguments = KShell::splitArgs(match.data().toString(), KShell::AbortOnMeta, &splitArgsError);
+        
+        // If the arguments could not be split, abort
+        if (splitArgsError != KShell::Errors::NoError) {
+            return;
+        }
+        
+        // Pop the first "kwallet-add" from the list of arguments
+        arguments.pop_front();
+      
+        // Variables to store final map in
+        QString entryName = arguments[0];
+        QMap<QString, QString> keyValueMap;
+        
+        // Pop the entry name from the list of arguments as we've already saved it
+        arguments.pop_front();
+        
+        // Loop through and process each argument
+        Q_FOREACH (QString argument, arguments) {
+            QStringList keyValue = argument.split("=", QString::SkipEmptyParts);
+            
+            // If we could split in two, it's a valid key/value pair
+            if (keyValue.length() == 2) {
+                keyValueMap.insert(keyValue[0], keyValue[1]);
+            }
+        }
+      
+        m_wallet->setFolder("Passwords");
+        
+        // If we could successfully save this entry 
+        if (m_wallet->writeMap(entryName, keyValueMap) == 0) {
+            KNotification::event(KNotification::Notification, "KWallet", entryName+" added to KWallet.", "kwallet");
+        } else { // Otherwise notify user of error saving
+            KNotification::event(KNotification::Error, "KWallet", entryName+" could not be added.", "kwallet");
+        }
+    }
+    
+    // If we want to view an entry
+    else {
+        QString folder = match.subtext();
+        QString entry = match.text();
 
-    EntryDialog entryDialog;
-    entryDialog.init(folder, entry);
-    entryDialog.exec();
+        EntryDialog entryDialog;
+        entryDialog.init(folder, entry);
+        entryDialog.exec();
+    }
 }
 
-K_EXPORT_PLASMA_RUNNER(kwalletrunner, KWalletRunner)
+K_EXPORT_PLASMA_RUNNER(kwallet, KWalletRunner)
 
 #include "kwalletrunner.moc"
