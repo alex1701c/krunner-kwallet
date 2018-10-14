@@ -64,7 +64,7 @@ void KWalletRunner::match(Plasma::RunnerContext &context)
             Q_FOREACH (QString entryName, m_wallet->entryList()) {
                 
                 // If there's no search term or the entry contains the search term...
-                if (!searchTerm.length() || entryName.contains(searchTerm)) {
+                if (!searchTerm.length() || entryName.contains(searchTerm, Qt::CaseInsensitive)) {
                     // ... add it to the list of results
                     Plasma::QueryMatch match(this);
                     match.setType(Plasma::QueryMatch::ExactMatch);
