@@ -27,20 +27,23 @@ using KWallet::Wallet;
 
 class QAction;
 
-class KWalletRunner : public Plasma::AbstractRunner
-{
-    Q_OBJECT
+class KWalletRunner : public Plasma::AbstractRunner {
+Q_OBJECT
 
-  public:
+public:
 
-    KWalletRunner( QObject *parent, const QVariantList& args );
+    KWalletRunner(QObject *parent, const QVariantList &args);
+
     ~KWalletRunner() override;
 
     void match(Plasma::RunnerContext &context) override;
+
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
-    
-  private:
-    Wallet *m_wallet; 
+
+    QList<QAction *> actionsForMatch(const Plasma::QueryMatch &match) override;
+
+private:
+    Wallet *m_wallet;
 };
 
 #endif /* KWALLETRUNNER_H */

@@ -40,22 +40,22 @@ EntryDialog::~EntryDialog() {
     delete ui;
 }
 
-bool EntryDialog::init(const QString &folder, const QString &entry) {
+bool EntryDialog::init(EntryDialogData *data) {
     // Set titles
     setWindowTitle("KWallet Entry");
-    ui->entryBox->setTitle(entry);
+    ui->entryBox->setTitle(data->entry);
 
     // Open an instance of the wallet and set the folder
     Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), winId(), Wallet::Synchronous);
-    wallet->setFolder(folder);
+    wallet->setFolder(data->folder);
 
     // Depending on the type of entry (Map, Password, etc), add a different set of widgets
-    switch (wallet->entryType(entry)) {
+    switch (wallet->entryType(data->entry)) {
 
         // For Password, just add a QTextEdit
         case Wallet::Password: {
             QString entryPassword;
-            wallet->readPassword(entry, entryPassword);
+            wallet->readPassword(data->entry, entryPassword);
 
             auto *textEdit = new QTextEdit(this);
             textEdit->setReadOnly(true);
@@ -64,10 +64,10 @@ bool EntryDialog::init(const QString &folder, const QString &entry) {
 
             break;
         }
-        // For Map, add a QLabel and QLineEdit per map
+            // For Map, add a QLabel and QLineEdit per map
         case Wallet::Map: {
             QMap<QString, QString> entryMap;
-            wallet->readMap(entry, entryMap);
+            wallet->readMap(data->entry, entryMap);
 
             QMap<QString, QString>::const_iterator i = entryMap.constBegin();
             while (i != entryMap.constEnd()) {
@@ -101,6 +101,7 @@ bool EntryDialog::init(const QString &folder, const QString &entry) {
 
     // Delete the wallet
     delete wallet;
+    delete data;
 
     return true;
 }

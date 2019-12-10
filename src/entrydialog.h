@@ -22,12 +22,25 @@
 
 #include <QDialog>
 #include <KWallet/KWallet>
+#include <utility>
 
 using KWallet::Wallet;
 
 namespace Ui {
     class EntryDialog;
 }
+
+class EntryDialogData : public QObject {
+Q_OBJECT
+public:
+    const QString folder;
+    const QString entry;
+
+public:
+    EntryDialogData(QString folder, QString entry, QObject *parent = nullptr) : QObject(parent), folder(std::move(folder)),
+                                                                                entry(std::move(entry)) {}
+};
+
 
 class EntryDialog : public QDialog {
 Q_OBJECT
@@ -38,7 +51,7 @@ public:
 
     ~EntryDialog() override;
 
-    bool init(const QString &folder, const QString &entry);
+    bool init(EntryDialogData *data);
 
 private slots:
 

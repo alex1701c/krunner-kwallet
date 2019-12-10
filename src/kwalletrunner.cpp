@@ -24,6 +24,9 @@
 #include <KLocalizedString>
 #include <KNotifications/KNotification>
 #include <KShell>
+#include <QAction>
+#include <QApplication>
+#include <QClipboard>
 
 #include "entrydialog.h"
 
@@ -146,15 +149,50 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
         }
     }
 
-    // If we want to view an entry
-    else {
+        // If we want to view an entry
+    else if (match.selectedAction() != nullptr && match.selectedAction()->data() == "overview") {
         QString folder = match.subtext();
         QString entry = match.text();
-        EntryDialog entryDialog;
-        entryDialog.init(folder, entry);
-        entryDialog.exec();
+        auto *data = new EntryDialogData(folder, entry);
+        QTimer::singleShot(0, data, [data]() {
+            EntryDialog entryDialog;
+            entryDialog.init(data);
+            entryDialog.exec();
+        });
+    } else {
+        Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
+        wallet->setFolder(match.subtext());
+        if (wallet->entryType(match.text()) == Wallet::Password) {
+            QString password;
+            wallet->readPassword(match.text(), password);
+            QClipboard *cb = QApplication::clipboard();
+            cb->setText(password);
+            QTimer::singleShot(5000, cb, [cb]() {
+                // Clipboard managers might cause the clear function to not work properly
+                cb->setText("");
+                // TODO Clipper integration ?
+            });
+        } else {
+            QString folder = match.subtext();
+            QString entry = match.text();
+            auto *data = new EntryDialogData(folder, entry);
+            QTimer::singleShot(0, data, [data]() {
+                EntryDialog entryDialog;
+                entryDialog.init(data);
+                entryDialog.exec();
+            });
+        }
     }
 }
+
+QList<QAction *> KWalletRunner::actionsForMatch(const Plasma::QueryMatch &match) {
+    Q_UNUSED(match)
+
+    auto *overview = addAction("overview", QIcon::fromTheme("documentinfo"), "Show Overview (Shift+Enter)");
+    overview->setData("overview");
+    return QList<QAction *>({overview});
+}
+
 
 K_EXPORT_PLASMA_RUNNER(kwallet, KWalletRunner)
 
