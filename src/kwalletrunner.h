@@ -34,10 +34,10 @@ class KWalletRunner : public Plasma::AbstractRunner
   public:
 
     KWalletRunner( QObject *parent, const QVariantList& args );
-    ~KWalletRunner();
+    ~KWalletRunner() override;
 
-    void match(Plasma::RunnerContext &context);
-    void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match);
+    void match(Plasma::RunnerContext &context) override;
+    void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
     
   private:
     Wallet *m_wallet; 

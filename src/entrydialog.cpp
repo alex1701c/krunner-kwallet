@@ -21,6 +21,7 @@
 #include "ui_entrydialog.h"
 
 #include <QClipboard>
+#include <QApplication>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -30,19 +31,16 @@
 #include <QDebug>
 
 EntryDialog::EntryDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::EntryDialog)
-{
+        QDialog(parent),
+        ui(new Ui::EntryDialog) {
     ui->setupUi(this);
 }
 
-EntryDialog::~EntryDialog()
-{
+EntryDialog::~EntryDialog() {
     delete ui;
 }
 
-bool EntryDialog::init(QString folder, QString entry)
-{
+bool EntryDialog::init(const QString &folder, const QString &entry) {
     // Set titles
     setWindowTitle("KWallet Entry");
     ui->entryBox->setTitle(entry);
@@ -59,14 +57,13 @@ bool EntryDialog::init(QString folder, QString entry)
             QString entryPassword;
             wallet->readPassword(entry, entryPassword);
 
-            QTextEdit *textEdit = new QTextEdit(this);
+            auto *textEdit = new QTextEdit(this);
             textEdit->setReadOnly(true);
             textEdit->setText(entryPassword);
             ui->entryLayout->addWidget(textEdit);
 
             break;
         }
-
         // For Map, add a QLabel and QLineEdit per map
         case Wallet::Map: {
             QMap<QString, QString> entryMap;
@@ -76,24 +73,26 @@ bool EntryDialog::init(QString folder, QString entry)
             while (i != entryMap.constEnd()) {
 
                 // Add QLabel
-                QLabel *label = new QLabel(this);
+                auto *label = new QLabel(this);
                 label->setText(i.key());
                 ui->entryLayout->addWidget(label);
 
                 // Add QLineEdit and Copy Button
-                QHBoxLayout *horizontalLayout = new QHBoxLayout(this);
+                auto *horizontalLayout = new QHBoxLayout(this);
                 ui->entryLayout->addLayout(horizontalLayout);
-                QLineEdit *lineEdit = new QLineEdit(this);
+
+                auto *lineEdit = new QLineEdit(this);
                 lineEdit->setText(i.value());
                 lineEdit->setReadOnly(true);
                 horizontalLayout->addWidget(lineEdit);
-                QToolButton *copyButton = new QToolButton(this);
+
+                auto *copyButton = new QToolButton(this);
                 copyButton->setIcon(QIcon::fromTheme("edit-copy"));
                 copyButton->setProperty("value", i.value());
                 connect(copyButton, SIGNAL(clicked(bool)), this, SLOT(copyToClipboard()));
                 horizontalLayout->addWidget(copyButton);
 
-                i++;
+                ++i;
             }
 
             break;
@@ -106,14 +105,12 @@ bool EntryDialog::init(QString folder, QString entry)
     return true;
 }
 
-void EntryDialog::copyToClipboard()
-{
-    QString value = QObject::sender()->property("value").toString();
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(value);
+void EntryDialog::copyToClipboard() {
+    const QString value = QObject::sender()->property("value").toString();
+    QApplication::clipboard()->setText(value);
+
 }
 
-void EntryDialog::on_buttonBox_accepted()
-{
+void EntryDialog::on_buttonBox_accepted() {
     close();
 }

@@ -29,17 +29,19 @@ namespace Ui {
     class EntryDialog;
 }
 
-class EntryDialog : public QDialog
-{
-    Q_OBJECT
+class EntryDialog : public QDialog {
+Q_OBJECT
+
 
 public:
-    explicit EntryDialog(QWidget *parent = 0);
-    ~EntryDialog();
+    explicit EntryDialog(QWidget *parent = nullptr);
 
-    bool init(QString folder, QString entry);
+    ~EntryDialog() override;
+
+    bool init(const QString &folder, const QString &entry);
 
 private slots:
+
     void copyToClipboard();
 
     void on_buttonBox_accepted();
