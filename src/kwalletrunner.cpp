@@ -150,7 +150,27 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
     }
 
         // If we want to view an entry
-    else if (match.selectedAction() != nullptr && match.selectedAction()->data() == "overview") {
+    else if (match.selectedAction() == nullptr) {
+        Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
+        wallet->setFolder(match.subtext());
+        const Wallet::EntryType entryType = wallet->entryType(match.text());
+        if (entryType == Wallet::Password) {
+            QString password;
+            wallet->readPassword(match.text(), password);
+            setClipboardPassword(password);
+            delete wallet;
+            return;
+        } else if (entryType == Wallet::Map) {
+            QMap<QString, QString> resMap;
+            wallet->readMap(match.text(), resMap);
+            if (!resMap.isEmpty() && resMap.size() == 1) {
+                setClipboardPassword(resMap.values().at(0));
+                delete wallet;
+                return;
+            }
+        }
+
+        // Default action
         QString folder = match.subtext();
         QString entry = match.text();
         auto *data = new EntryDialogData(folder, entry);
@@ -159,29 +179,6 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
             entryDialog.init(data);
             entryDialog.exec();
         });
-    } else {
-        Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
-        wallet->setFolder(match.subtext());
-        if (wallet->entryType(match.text()) == Wallet::Password) {
-            QString password;
-            wallet->readPassword(match.text(), password);
-            QClipboard *cb = QApplication::clipboard();
-            cb->setText(password);
-            QTimer::singleShot(5000, cb, [cb]() {
-                // Clipboard managers might cause the clear function to not work properly
-                cb->setText("");
-                // TODO Clipper integration ?
-            });
-        } else {
-            QString folder = match.subtext();
-            QString entry = match.text();
-            auto *data = new EntryDialogData(folder, entry);
-            QTimer::singleShot(0, data, [data]() {
-                EntryDialog entryDialog;
-                entryDialog.init(data);
-                entryDialog.exec();
-            });
-        }
     }
 }
 
@@ -191,6 +188,15 @@ QList<QAction *> KWalletRunner::actionsForMatch(const Plasma::QueryMatch &match)
     auto *overview = addAction("overview", QIcon::fromTheme("documentinfo"), "Show Overview (Shift+Enter)");
     overview->setData("overview");
     return QList<QAction *>({overview});
+}
+
+void KWalletRunner::setClipboardPassword(const QString &password) {
+    QClipboard *cb = QApplication::clipboard();
+    cb->setText(password);
+    QTimer::singleShot(5000, cb, [cb]() {
+        // Clipboard managers might cause the clear function to not work properly
+        cb->setText("");
+    });
 }
 
 

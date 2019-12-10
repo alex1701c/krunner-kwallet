@@ -42,6 +42,8 @@ public:
 
     QList<QAction *> actionsForMatch(const Plasma::QueryMatch &match) override;
 
+    static void setClipboardPassword(const QString &password);
+
 private:
     Wallet *m_wallet;
 };
