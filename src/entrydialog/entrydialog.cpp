@@ -92,9 +92,8 @@ bool EntryDialog::init(EntryDialogData *data) {
         horizontalLayout2->addWidget(createDisplayLine(entryPassword.toHex()));
         horizontalLayout2->addWidget(createCopyToolButton(entryPassword.toHex()));
     }
-// Delete the wallet
+
     delete wallet;
-    delete data;
 
     return true;
 }

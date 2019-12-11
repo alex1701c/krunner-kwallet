@@ -27,6 +27,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
+#include <adddialog/adddialog.h>
 
 #include "entrydialog/entrydialog.h"
 
@@ -44,7 +45,7 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
     // Open the wallet
     wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
 
-    auto *overview = addAction("overview", QIcon::fromTheme("documentinfo"), "Show Overview (Shift+Enter)");
+    auto *overview = addAction("overview", QIcon::fromTheme("documentinfo"), "Show Overview");
     overview->setData("overview");
     actions.clear();
     actions.append(overview);
@@ -104,47 +105,17 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
 
     // If we are adding an entry
     if (match.type() == Plasma::QueryMatch::HelperMatch) {
-        // Get a list of the arguments  
-        KShell::Errors splitArgsError;
-        QStringList arguments = KShell::splitArgs(match.data().toString(), KShell::AbortOnMeta, &splitArgsError);
-
-        // If the arguments could not be split, abort
-        if (splitArgsError != KShell::Errors::NoError) {
-            return;
-        }
-
-        // Pop the first "kwallet-add" from the list of arguments
-        arguments.pop_front();
-
-        // Variables to store final map in
-        QString entryName = arguments[0];
-        QMap<QString, QString> keyValueMap;
-
-        // Pop the entry name from the list of arguments as we've already saved it
-        arguments.pop_front();
-
-        // Loop through and process each argument
-        for (const QString &argument: arguments) {
-            const QStringList keyValue = argument.split("=", QString::SkipEmptyParts);
-
-            // If we could split in two, it's a valid key/value pair
-            if (keyValue.length() == 2) {
-                keyValueMap.insert(keyValue[0], keyValue[1]);
-            }
-        }
-
-        wallet->setFolder("Passwords");
-
-        // If we could successfully save this entry 
-        if (wallet->writeMap(entryName, keyValueMap) == 0) {
-            KNotification::event(KNotification::Notification, "KWallet", entryName + " added to KWallet.", "kwalletmanager");
-        } else { // Otherwise notify user of error saving
-            KNotification::event(KNotification::Error, "KWallet", entryName + " could not be added.", "kwalletmanager");
-        }
+        auto *data = new AddDialogData(match.data().toString().remove(addRegex));
+        QTimer::singleShot(0, data, [data]() {
+            AddDialog addDialog;
+            addDialog.init(data);
+            addDialog.exec();
+            delete data;
+        });
         return;
     }
 
-        // If we want to view an entry
+        // Default case
     else if (match.selectedAction() == nullptr) {
         wallet->setFolder(match.subtext());
         const Wallet::EntryType entryType = wallet->entryType(match.text());
@@ -163,7 +134,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
         }
     }
 
-    // Default action
+    // Fallback case
     QString folder = match.subtext();
     QString entry = match.text();
     auto *data = new EntryDialogData(folder, entry);
@@ -171,6 +142,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
         EntryDialog entryDialog;
         entryDialog.init(data);
         entryDialog.exec();
+        delete data;
     });
 }
 
