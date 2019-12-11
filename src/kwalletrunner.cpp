@@ -28,11 +28,11 @@
 #include <QApplication>
 #include <QClipboard>
 
-#include "entrydialog.h"
+#include "entrydialog/entrydialog.h"
 
 KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
         Plasma::AbstractRunner(parent, args) {
-    Q_UNUSED(args);
+    Q_UNUSED(args)
 
     setObjectName(QLatin1String("KWallet"));
 
@@ -42,28 +42,37 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
                                    i18n(R"(Add an entry using syntax: entryName username="your_username" password="pass")")));
 
     // Open the wallet
-    m_wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
+    wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
+
+    auto *overview = addAction("overview", QIcon::fromTheme("documentinfo"), "Show Overview (Shift+Enter)");
+    overview->setData("overview");
+    actions.clear();
+    actions.append(overview);
 }
 
 KWalletRunner::~KWalletRunner() {
-    delete m_wallet;
+    delete wallet;
 }
 
 void KWalletRunner::match(Plasma::RunnerContext &context) {
     if (!context.isValid()) return;
 
+    if (!Wallet::isEnabled() || !wallet->isOpen()) {
+        KNotification::event(KNotification::Error, "KWallet", "Could not open KWallet!", "kwallet");
+    }
+
     // Make sure command starts with "kwallet"
-    if (context.query().startsWith(QLatin1String("kwallet "), Qt::CaseInsensitive)) {
+    if (context.query().startsWith(searchString, Qt::CaseInsensitive)) {
         // Get the search term
         const QString searchTerm = context.query().split(" ", QString::SkipEmptyParts).at(1);
         // Cycle through each folder in our wallet
-        for (const QString &folderName: m_wallet->folderList()) {
+        for (const QString &folderName: wallet->folderList()) {
 
             // Set the folder
-            m_wallet->setFolder(folderName);
+            wallet->setFolder(folderName);
 
             // Cycle through each entry
-            for (const QString &entryName: m_wallet->entryList()) {
+            for (const QString &entryName: wallet->entryList()) {
                 if (searchTerm.isEmpty() || entryName.contains(searchTerm, Qt::CaseInsensitive)) {
                     Plasma::QueryMatch match(this);
                     match.setType(Plasma::QueryMatch::ExactMatch);
@@ -77,30 +86,15 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
     }
 
     // KWallet Add
-    if (context.isValid() && context.query().startsWith(QLatin1String("kwallet-add "), Qt::CaseInsensitive)) {
-        // Get a list of the arguments  
-        KShell::Errors splitArgsError;
-        QStringList arguments = KShell::splitArgs(context.query(), KShell::AbortOnMeta, &splitArgsError);
-
-        // If the arguments could not be split, abort
-        if (splitArgsError != KShell::Errors::NoError) {
-            return;
-        }
-
-        // Pop the first "kwallet-add" from the list of arguments
-        arguments.pop_front();
-
-        // If there's at least two arguments
-        if (arguments.length() >= 2) {
-            // Show option to open OneTimePass
-            Plasma::QueryMatch newAction(this);
-            newAction.setId("add");
-            newAction.setType(Plasma::QueryMatch::HelperMatch);
-            newAction.setIconName("kwalletmanager");
-            newAction.setText("Add entry for " + arguments[0]);
-            newAction.setData(context.query());
-            context.addMatch(newAction);
-        }
+    if (context.query().contains(addRegex)) {
+        // Show option to open OneTimePass
+        Plasma::QueryMatch newAction(this);
+        newAction.setId("add");
+        newAction.setType(Plasma::QueryMatch::HelperMatch);
+        newAction.setIconName("kwalletmanager");
+        newAction.setText("Add entry for " + context.query().remove(addRegex));
+        newAction.setData(context.query());
+        context.addMatch(newAction);
     }
 }
 
@@ -139,55 +133,51 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
             }
         }
 
-        m_wallet->setFolder("Passwords");
+        wallet->setFolder("Passwords");
 
         // If we could successfully save this entry 
-        if (m_wallet->writeMap(entryName, keyValueMap) == 0) {
-            KNotification::event(KNotification::Notification, "KWallet", entryName + " added to KWallet.", "kwallet");
+        if (wallet->writeMap(entryName, keyValueMap) == 0) {
+            KNotification::event(KNotification::Notification, "KWallet", entryName + " added to KWallet.", "kwalletmanager");
         } else { // Otherwise notify user of error saving
-            KNotification::event(KNotification::Error, "KWallet", entryName + " could not be added.", "kwallet");
+            KNotification::event(KNotification::Error, "KWallet", entryName + " could not be added.", "kwalletmanager");
         }
+        return;
     }
 
         // If we want to view an entry
     else if (match.selectedAction() == nullptr) {
-        Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
         wallet->setFolder(match.subtext());
         const Wallet::EntryType entryType = wallet->entryType(match.text());
         if (entryType == Wallet::Password) {
             QString password;
             wallet->readPassword(match.text(), password);
             setClipboardPassword(password);
-            delete wallet;
             return;
         } else if (entryType == Wallet::Map) {
             QMap<QString, QString> resMap;
             wallet->readMap(match.text(), resMap);
             if (!resMap.isEmpty() && resMap.size() == 1) {
                 setClipboardPassword(resMap.values().at(0));
-                delete wallet;
                 return;
             }
         }
-
-        // Default action
-        QString folder = match.subtext();
-        QString entry = match.text();
-        auto *data = new EntryDialogData(folder, entry);
-        QTimer::singleShot(0, data, [data]() {
-            EntryDialog entryDialog;
-            entryDialog.init(data);
-            entryDialog.exec();
-        });
     }
+
+    // Default action
+    QString folder = match.subtext();
+    QString entry = match.text();
+    auto *data = new EntryDialogData(folder, entry);
+    QTimer::singleShot(0, data, [data]() {
+        EntryDialog entryDialog;
+        entryDialog.init(data);
+        entryDialog.exec();
+    });
 }
 
 QList<QAction *> KWalletRunner::actionsForMatch(const Plasma::QueryMatch &match) {
     Q_UNUSED(match)
 
-    auto *overview = addAction("overview", QIcon::fromTheme("documentinfo"), "Show Overview (Shift+Enter)");
-    overview->setData("overview");
-    return QList<QAction *>({overview});
+    return actions;
 }
 
 void KWalletRunner::setClipboardPassword(const QString &password) {

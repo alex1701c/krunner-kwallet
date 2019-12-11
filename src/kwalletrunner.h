@@ -25,8 +25,6 @@
 
 using KWallet::Wallet;
 
-class QAction;
-
 class KWalletRunner : public Plasma::AbstractRunner {
 Q_OBJECT
 
@@ -45,7 +43,10 @@ public:
     static void setClipboardPassword(const QString &password);
 
 private:
-    Wallet *m_wallet;
+    Wallet *wallet;
+    QList<QAction *> actions;
+    const QString searchString = QLatin1String("kwallet ");
+    const QRegExp addRegex = QRegExp("^kwallet-add ?");
 };
 
 #endif /* KWALLETRUNNER_H */

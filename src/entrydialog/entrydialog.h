@@ -23,6 +23,9 @@
 #include <QDialog>
 #include <KWallet/KWallet>
 #include <utility>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QLabel>
 
 using KWallet::Wallet;
 
@@ -53,6 +56,12 @@ public:
 
     bool init(EntryDialogData *data);
 
+    QToolButton *createCopyToolButton(const QVariant &property);
+
+    QLineEdit *createDisplayLine(const QString &text);
+
+    QLabel *createLabel(const QString &text);
+
 private slots:
 
     void copyToClipboard();
@@ -61,8 +70,6 @@ private slots:
 
 private:
     Ui::EntryDialog *ui;
-
-    Wallet *m_wallet;
 };
 
 #endif // ENTRYDIALOG_H
