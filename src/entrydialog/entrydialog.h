@@ -44,7 +44,6 @@ public:
                                                                                 entry(std::move(entry)) {}
 };
 
-
 class EntryDialog : public QDialog {
 Q_OBJECT
 

@@ -37,20 +37,21 @@ class AddDialogData : public QObject {
 Q_OBJECT
 public:
     const QString name;
+    const QString action;
 
 public:
     AddDialogData(QString name = "", QObject *parent = nullptr) : QObject(parent), name(std::move(name)) {}
 };
 
 
-class AddDialog : public QDialog {
+class EditDialog : public QDialog {
 Q_OBJECT
 
 
 public:
-    explicit AddDialog(QWidget *parent = nullptr);
+    explicit EditDialog(QWidget *parent = nullptr);
 
-    ~AddDialog() override;
+    ~EditDialog() override;
 
     bool init(AddDialogData *data);
 

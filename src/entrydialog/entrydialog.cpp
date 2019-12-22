@@ -41,13 +41,17 @@ EntryDialog::~EntryDialog() {
 
 bool EntryDialog::init(EntryDialogData *data) {
     // Set titles
-    setWindowTitle("KWallet Entry");
+    setWindowTitle(QStringLiteral("KWallet Entry"));
     ui->entryBox->setTitle(data->entry);
 
     // Open an instance of the wallet and set the folder
     Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), winId(), Wallet::Synchronous);
     if (!wallet->isOpen()) {
-        KNotification::event(KNotification::Error, "KWallet", "Could not open KWallet!", "kwalletmanager");
+        KNotification::event(KNotification::Error,
+                             QStringLiteral("KWallet"),
+                             QStringLiteral("Could not open KWallet!"),
+                             QStringLiteral("kwalletmanager"));
+        return false;
     }
     wallet->setFolder(data->folder);
     const auto type = wallet->entryType(data->entry);
@@ -72,29 +76,33 @@ bool EntryDialog::init(EntryDialogData *data) {
             ui->entryLayout->addLayout(horizontalLayout);
             horizontalLayout->addWidget(createDisplayLine(i.value()));
             horizontalLayout->addWidget(createCopyToolButton(i.value()));
-
             ++i;
         }
-    } else {
-        ui->entryLayout->addWidget(createLabel("Stream Type"));
+    } else if (type == Wallet::Stream) {
+        ui->entryLayout->addWidget(createLabel(QStringLiteral("Stream Type")));
         QByteArray entryPassword;
         wallet->readEntry(data->entry, entryPassword);
 
         auto *horizontalLayout = new QHBoxLayout(this);
         ui->entryLayout->addLayout(horizontalLayout);
-        horizontalLayout->addWidget(createLabel("Password in text"));
+        horizontalLayout->addWidget(createLabel(QStringLiteral("Password in text")));
         horizontalLayout->addWidget(createDisplayLine(entryPassword));
         horizontalLayout->addWidget(createCopyToolButton(entryPassword));
 
         auto *horizontalLayout2 = new QHBoxLayout(this);
         ui->entryLayout->addLayout(horizontalLayout2);
-        horizontalLayout2->addWidget(createLabel("Password in hex "));
+        horizontalLayout2->addWidget(createLabel(QStringLiteral("Password in hex ")));
         horizontalLayout2->addWidget(createDisplayLine(entryPassword.toHex()));
         horizontalLayout2->addWidget(createCopyToolButton(entryPassword.toHex()));
+    } else {
+        KNotification::event(KNotification::Error,
+                             QStringLiteral("KWallet"),
+                             QStringLiteral("Could not open KWallet!"),
+                             QStringLiteral("kwalletmanager"));
+        return false;
     }
 
     delete wallet;
-
     return true;
 }
 
@@ -116,7 +124,7 @@ QLineEdit *EntryDialog::createDisplayLine(const QString &text) {
 
 QToolButton *EntryDialog::createCopyToolButton(const QVariant &property) {
     auto *copyButton = new QToolButton(this);
-    copyButton->setIcon(QIcon::fromTheme("edit-copy"));
+    copyButton->setIcon(QIcon::fromTheme(QStringLiteral("edit-copy")));
     copyButton->setProperty("value", property);
     connect(copyButton, &QToolButton::clicked, this, &EntryDialog::copyToClipboard);
     return copyButton;

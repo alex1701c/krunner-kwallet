@@ -17,8 +17,8 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "adddialog.h"
-#include "ui_adddialog.h"
+#include "editdialog.h"
+#include "ui_editdialog.h"
 
 #include <QClipboard>
 #include <QApplication>
@@ -30,27 +30,35 @@
 #include <QToolButton>
 #include <QDebug>
 #include <KNotifications/KNotification>
+#include <QStringBuilder>
 
-AddDialog::AddDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddDialog) {
+// Test dq
+EditDialog::EditDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddDialog) {
     ui->setupUi(this);
 }
 
-AddDialog::~AddDialog() {
+EditDialog::~EditDialog() {
     delete ui;
 }
 
-bool AddDialog::init(AddDialogData *data) {
+bool EditDialog::init(AddDialogData *data) {
     ui->nameLineEdit->setText(data->name);
     return true;
 }
 
-void AddDialog::on_buttonBox_accepted() {
+void EditDialog::on_buttonBox_accepted() {
     const QString entryName = ui->nameLineEdit->text();
-    wallet->setFolder("Passwords");
-    if (wallet->writePassword(entryName,ui->passwordPlainTextEdit->text()) == 0) {
-        KNotification::event(KNotification::Notification, "KWallet", entryName + " added to KWallet.", "kwalletmanager");
-    } else { // Otherwise notify user of error saving
-        KNotification::event(KNotification::Error, "KWallet", entryName + " could not be added.", "kwalletmanager");
+    wallet->setFolder("");
+    if (wallet->writePassword(entryName, ui->passwordPlainTextEdit->text()) == 0) {
+        KNotification::event(KNotification::Notification,
+                             QStringLiteral("KWallet"),
+                             entryName % " saved to KWallet.",
+                             QStringLiteral("kwalletmanager"));
+    } else {
+        KNotification::event(KNotification::Error,
+                             QStringLiteral("KWallet"),
+                             entryName % " could not be saved.",
+                             QStringLiteral("kwalletmanager"));
     }
     close();
 }

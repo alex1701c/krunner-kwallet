@@ -22,6 +22,10 @@
 
 #include <KRunner/AbstractRunner>
 #include <KWallet/KWallet>
+#include <QStringBuilder>
+
+#include <editdialog/editdialog.h>
+#include "entrydialog/entrydialog.h"
 
 using KWallet::Wallet;
 
@@ -45,8 +49,9 @@ public:
 private:
     Wallet *wallet;
     QList<QAction *> actions;
-    const QString searchString = QLatin1String("kwallet ");
-    const QRegExp addRegex = QRegExp("^kwallet-add ?");
+    const QLatin1String searchString = QLatin1String("kwallet ");
+    const QLatin1String defaultMatchId = QLatin1String("kwalletrunner");
+    const QRegExp addRegex = QRegExp(QStringLiteral("^kwallet-add ?"));
 };
 
 #endif /* KWALLETRUNNER_H */

@@ -1,6 +1,6 @@
-set(runner_SRCS kwalletrunner.cpp entrydialog/entrydialog.cpp adddialog/adddialog.cpp)
+set(runner_SRCS kwalletrunner.cpp entrydialog/entrydialog.cpp editdialog/editdialog.cpp)
 ki18n_wrap_ui(runner_SRCS entrydialog/entrydialog.ui)
-ki18n_wrap_ui(runner_SRCS adddialog/adddialog.ui)
+ki18n_wrap_ui(runner_SRCS editdialog/editdialog.ui)
 
 add_library(krunner_kwallet MODULE ${runner_SRCS})
 target_link_libraries(krunner_kwallet
