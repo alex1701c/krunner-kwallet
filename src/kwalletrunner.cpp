@@ -1,22 +1,3 @@
-/*
-    KWallet Runner
-    Copyright (C) 2016  James Augustus Zuccon <zuccon@gmail.com>
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-
 #include "kwalletrunner.h"
 
 #include <QDebug>
@@ -47,8 +28,14 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
                                QIcon::fromTheme(QStringLiteral("documentinfo")),
                                QStringLiteral("Show Overview"));
     overview->setData(QStringLiteral("overview"));
+    auto *edit = addAction(QStringLiteral("overview"),
+                           QIcon::fromTheme(QStringLiteral("document-edit")),
+                           QStringLiteral("Edit"));
+    edit->setData(QStringLiteral("edit"));
     actions.clear();
     actions.append(overview);
+    actions.append(edit);
+    // TODO Action for edit
 }
 
 KWalletRunner::~KWalletRunner() {
@@ -84,6 +71,8 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
                     match.setIconName(QStringLiteral("kwalletmanager"));
                     match.setText(entryName);
                     match.setSubtext(folderName);
+                    match.setData(entryName);
+                    match.setId("");
                     context.addMatch(match);
                 }
             }
@@ -97,19 +86,19 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
         wallet->setFolder("");
         const bool entryExists = !entryName.isEmpty() && wallet->hasEntry(entryName);
 
-        Plasma::QueryMatch newAction(this);
-        newAction.setId(entryExists ? QStringLiteral("edit") : QStringLiteral("add"));
-        newAction.setType(Plasma::QueryMatch::HelperMatch);
-        newAction.setIconName(QStringLiteral("kwalletmanager"));
+        Plasma::QueryMatch match(this);
+        match.setId(entryExists ? QStringLiteral("edit") : QStringLiteral("add"));
+        match.setType(Plasma::QueryMatch::HelperMatch);
+        match.setIconName(QStringLiteral("kwalletmanager"));
         if (entryExists) {
-            newAction.setText(QStringLiteral("Edit entry for ") % entryName);
+            match.setText(QStringLiteral("Edit entry for ") % entryName);
         } else if (!entryName.isEmpty()) {
-            newAction.setText(QStringLiteral("Add entry for ") % entryName);
+            match.setText(QStringLiteral("Add entry for ") % entryName);
         } else {
-            newAction.setText(QStringLiteral("Add entry"));
+            match.setText(QStringLiteral("Add entry"));
         }
-        newAction.setData(context.query());
-        context.addMatch(newAction);
+        match.setData(context.query());
+        context.addMatch(match);
 
     }
 }
@@ -117,9 +106,10 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
 
 void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) {
     Q_UNUSED(context)
+    wallet->setFolder("");
 
     // If we are adding or editing an entry
-    if (match.type() == Plasma::QueryMatch::HelperMatch) {
+    if (match.type() == Plasma::QueryMatch::HelperMatch || match.selectedAction()->data().toString() == QLatin1String("edit")) {
         auto *data = new AddDialogData(match.data().toString().remove(addRegex));
         if (wallet->hasEntry(data->name)) {
             if (wallet->entryType(data->name) == Wallet::Password) {

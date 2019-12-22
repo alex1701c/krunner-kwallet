@@ -1,8 +1,8 @@
 ## KWallet Runner
 
-This plugin allows you to copy/show/insert passwords from KWallet. 
+This plugin allows you to copy/show/add/edit passwords from KWallet. 
 
-*This fork ist still in development*
+This is a fork from https://github.com/jimtendo/kwallet-runner but has extra features added and deprecated code removed.  
 
 Required Dependencies
 ----------------------

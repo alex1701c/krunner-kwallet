@@ -30,6 +30,13 @@
       <item>
        <layout class="QVBoxLayout" name="entryLayout">
         <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Info: This entry already exists !</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLineEdit" name="nameLineEdit">
           <property name="placeholderText">
            <string>Name</string>
