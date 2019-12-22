@@ -78,7 +78,7 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
 
             // Cycle through each entry
             for (const QString &entryName: wallet->entryList()) {
-                if (searchTerm.isEmpty() || entryName.contains(searchTerm, Qt::CaseInsensitive)) {
+                if (entryName.contains(searchTerm, Qt::CaseInsensitive)) {
                     Plasma::QueryMatch match(this);
                     match.setType(Plasma::QueryMatch::ExactMatch);
                     match.setIconName(QStringLiteral("kwalletmanager"));
@@ -97,7 +97,6 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
         wallet->setFolder("");
         const bool entryExists = !entryName.isEmpty() && wallet->hasEntry(entryName);
 
-        // TODO Edit entries
         Plasma::QueryMatch newAction(this);
         newAction.setId(entryExists ? QStringLiteral("edit") : QStringLiteral("add"));
         newAction.setType(Plasma::QueryMatch::HelperMatch);
@@ -122,6 +121,20 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
     // If we are adding or editing an entry
     if (match.type() == Plasma::QueryMatch::HelperMatch) {
         auto *data = new AddDialogData(match.data().toString().remove(addRegex));
+        if (wallet->hasEntry(data->name)) {
+            if (wallet->entryType(data->name) == Wallet::Password) {
+                QString password;
+                wallet->readPassword(data->name, password);
+                data->value = password;
+            } else {
+                KNotification::event(KNotification::Error,
+                                     QStringLiteral("KWallet"),
+                                     QStringLiteral("Can not edit entry, please use the KwalletManager tool for this !"),
+                                     QStringLiteral("kwallet"));
+                return;
+            }
+
+        }
         QTimer::singleShot(0, data, [data]() {
             EditDialog addDialog;
             addDialog.init(data);

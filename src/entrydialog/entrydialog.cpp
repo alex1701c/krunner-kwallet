@@ -111,10 +111,6 @@ void EntryDialog::copyToClipboard() {
     QApplication::clipboard()->setText(value);
 }
 
-void EntryDialog::on_buttonBox_accepted() {
-    close();
-}
-
 QLineEdit *EntryDialog::createDisplayLine(const QString &text) {
     auto *lineEdit = new QLineEdit(this);
     lineEdit->setText(text);

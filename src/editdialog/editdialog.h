@@ -26,6 +26,7 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QLabel>
+#include <KNotifications/KNotification>
 
 using KWallet::Wallet;
 
@@ -37,7 +38,7 @@ class AddDialogData : public QObject {
 Q_OBJECT
 public:
     const QString name;
-    const QString action;
+    QString value;
 
 public:
     AddDialogData(QString name = "", QObject *parent = nullptr) : QObject(parent), name(std::move(name)) {}
@@ -57,11 +58,14 @@ public:
 
 private slots:
 
-    void on_buttonBox_accepted();
+    void save_entry();
 
 private:
     Ui::AddDialog *ui;
     Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), winId(), Wallet::Synchronous);
+    QString initialName;
+
+    static void displayUpdateNotification(const QString &msg, const KNotification::StandardEvent type);
 };
 
 #endif // ADDDIALOG_H

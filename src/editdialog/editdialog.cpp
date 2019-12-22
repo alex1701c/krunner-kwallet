@@ -32,33 +32,44 @@
 #include <KNotifications/KNotification>
 #include <QStringBuilder>
 
-// Test dq
 EditDialog::EditDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddDialog) {
     ui->setupUi(this);
 }
 
 EditDialog::~EditDialog() {
     delete ui;
+    delete wallet;
 }
 
 bool EditDialog::init(AddDialogData *data) {
     ui->nameLineEdit->setText(data->name);
+    initialName = data->name;
+    ui->passwordPlainTextEdit->setText(data->value);
+
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &EditDialog::save_entry);
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &EditDialog::close);
+
     return true;
 }
 
-void EditDialog::on_buttonBox_accepted() {
+void EditDialog::save_entry() {
     const QString entryName = ui->nameLineEdit->text();
     wallet->setFolder("");
     if (wallet->writePassword(entryName, ui->passwordPlainTextEdit->text()) == 0) {
-        KNotification::event(KNotification::Notification,
-                             QStringLiteral("KWallet"),
-                             entryName % " saved to KWallet.",
-                             QStringLiteral("kwalletmanager"));
-    } else {
-        KNotification::event(KNotification::Error,
-                             QStringLiteral("KWallet"),
-                             entryName % " could not be saved.",
-                             QStringLiteral("kwalletmanager"));
+        displayUpdateNotification(entryName % " was saved to KWallet.", KNotification::Notification);
+    }else{
+        displayUpdateNotification(entryName % " could not saved to KWallet.", KNotification::Error);
     }
+    if (!initialName.isEmpty() && entryName != initialName) {
+        wallet->removeEntry(initialName);
+    }
+
     close();
+}
+
+void EditDialog::displayUpdateNotification(const QString &msg, const KNotification::StandardEvent type) {
+    KNotification::event(type,
+                         QStringLiteral("KWallet"),
+                         msg,
+                         QStringLiteral("kwalletmanager"));
 }

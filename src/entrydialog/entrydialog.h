@@ -65,8 +65,6 @@ private slots:
 
     void copyToClipboard();
 
-    void on_buttonBox_accepted();
-
 private:
     Ui::EntryDialog *ui;
 };
