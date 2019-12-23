@@ -1,3 +1,4 @@
+//  Licensed under the GNU GENERAL PUBLIC LICENSE Version 3. See License in the project root for license information.
 #include "kwalletrunner.h"
 
 #include <QDebug>
@@ -71,7 +72,7 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
                     match.setIconName(QStringLiteral("kwalletmanager"));
                     match.setText(entryName);
                     match.setSubtext(folderName);
-                    match.setData(entryName);
+                    match.setData(QStringList({folderName, entryName}));
                     match.setId("");
                     context.addMatch(match);
                 }
@@ -106,11 +107,13 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
 
 void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) {
     Q_UNUSED(context)
-    wallet->setFolder("");
 
     // If we are adding or editing an entry
-    if (match.type() == Plasma::QueryMatch::HelperMatch || match.selectedAction()->data().toString() == QLatin1String("edit")) {
-        auto *data = new AddDialogData(match.data().toString().remove(addRegex));
+    if (match.type() == Plasma::QueryMatch::HelperMatch ||
+        (match.selectedAction() != nullptr && match.selectedAction()->data().toString() == QLatin1String("edit"))) {
+        const QStringList matchData = match.data().toStringList();
+        auto *data = new EditDialogData(QString(matchData.at(1)).remove(addRegex), matchData.at(0));
+        wallet->setFolder(data->folder);
         if (wallet->hasEntry(data->name)) {
             if (wallet->entryType(data->name) == Wallet::Password) {
                 QString password;
@@ -146,7 +149,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
         } else if (entryType == Wallet::Map) {
             QMap<QString, QString> resMap;
             wallet->readMap(match.text(), resMap);
-            if (!resMap.isEmpty() && resMap.size() == 1) {
+            if (resMap.size() == 1) {
                 setClipboardPassword(resMap.values().at(0));
                 return;
             }
@@ -154,9 +157,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
     }
 
     // Fallback case
-    QString folder = match.subtext();
-    QString entry = match.text();
-    auto *data = new EntryDialogData(folder, entry);
+    const auto *data = new EntryDialogData(match.subtext(), match.text());
     QTimer::singleShot(0, data, [data]() {
         EntryDialog entryDialog;
         if (entryDialog.init(data)) {

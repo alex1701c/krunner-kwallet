@@ -1,3 +1,4 @@
+//  Licensed under the GNU GENERAL PUBLIC LICENSE Version 3. See License in the project root for license information.
 #ifndef KWALLETRUNNER_H
 #define KWALLETRUNNER_H
 

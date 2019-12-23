@@ -1,3 +1,4 @@
+//  Licensed under the GNU GENERAL PUBLIC LICENSE Version 3. See License in the project root for license information.
 #ifndef ENTRYDIALOG_H
 #define ENTRYDIALOG_H
 
@@ -34,7 +35,7 @@ public:
 
     ~EntryDialog() override;
 
-    bool init(EntryDialogData *data);
+    bool init(const EntryDialogData *data);
 
     QToolButton *createCopyToolButton(const QVariant &property);
 

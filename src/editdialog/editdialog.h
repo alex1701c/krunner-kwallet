@@ -1,3 +1,4 @@
+//  Licensed under the GNU GENERAL PUBLIC LICENSE Version 3. See License in the project root for license information.
 #ifndef ADDDIALOG_H
 #define ADDDIALOG_H
 
@@ -15,14 +16,16 @@ namespace Ui {
     class AddDialog;
 }
 
-class AddDialogData : public QObject {
+class EditDialogData : public QObject {
 Q_OBJECT
 public:
     const QString name;
+    const QString folder;
     QString value;
 
 public:
-    AddDialogData(QString name = "", QObject *parent = nullptr) : QObject(parent), name(std::move(name)) {}
+    explicit EditDialogData(QString name = "", QString folder = "", QObject *parent = nullptr) :
+            QObject(parent), name(std::move(name)), folder(std::move(folder)) {}
 };
 
 
@@ -35,7 +38,7 @@ public:
 
     ~EditDialog() override;
 
-    bool init(AddDialogData *data);
+    bool init(EditDialogData *data);
 
 private slots:
 
@@ -50,7 +53,7 @@ private:
     Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), winId(), Wallet::Synchronous);
     QString initialName;
 
-    static void displayUpdateNotification(const QString &msg, const KNotification::StandardEvent type);
+    static void displayUpdateNotification(const QString &msg, KNotification::StandardEvent type);
 };
 
 #endif // ADDDIALOG_H

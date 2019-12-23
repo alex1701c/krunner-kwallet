@@ -1,3 +1,4 @@
+//  Licensed under the GNU GENERAL PUBLIC LICENSE Version 3. See License in the project root for license information.
 #include "entrydialog.h"
 #include "ui_entrydialog.h"
 
@@ -7,7 +8,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QTextEdit>
 #include <QToolButton>
 #include <QDebug>
 #include <KNotifications/KNotification>
@@ -21,7 +21,7 @@ EntryDialog::~EntryDialog() {
     delete ui;
 }
 
-bool EntryDialog::init(EntryDialogData *data) {
+bool EntryDialog::init(const EntryDialogData *data) {
     // Set titles
     setWindowTitle(QStringLiteral("KWallet Entry"));
     ui->entryBox->setTitle(data->entry);
