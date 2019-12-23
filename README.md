@@ -43,8 +43,8 @@ show the password in a dialog info button(Shift+Return) or edit it.
 To add a new password type kwallet-add  
 ![Overview](https://raw.githubusercontent.com/alex1701c/Screenshots/master/krunner-kwallet/overview.png)
 
-If the password can not be copied to the clipboard or the user selects the info action the entry is shown ion a dialog  
+If the password can not be copied to the clipboard or the user selects the info action the entry is shown in a dialog  
 ![Show entry](https://raw.githubusercontent.com/alex1701c/Screenshots/master/krunner-kwallet/show_map.png)
 
-Edit normal password  
+Edit normal password, other entry types have to be edited in the KWalletManager tool  
 ![Edit entry](https://raw.githubusercontent.com/alex1701c/Screenshots/master/krunner-kwallet/edit_normal_password.png)
