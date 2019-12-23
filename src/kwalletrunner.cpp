@@ -36,7 +36,6 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
     actions.clear();
     actions.append(overview);
     actions.append(edit);
-    // TODO Action for edit
 }
 
 KWalletRunner::~KWalletRunner() {
