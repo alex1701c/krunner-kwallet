@@ -1,8 +1,11 @@
 #!/bin/bash
 
-if [[ $(basename "$PWD") != "kwallet-runner"* ]];then
-    git clone https://github.com/alex1701c/kwallet-runner
-    cd kwallet-runner/
+# Exit if something fails
+set -e
+
+if [[ $(basename "$PWD") != "krunner-kwallet"* ]];then
+    git clone https://github.com/alex1701c/krunner-kwallet
+    cd krunner-kwallet/
 fi
 
 mkdir -p build
