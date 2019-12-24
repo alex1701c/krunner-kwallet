@@ -32,8 +32,10 @@ private:
     Wallet *wallet;
     QList<QAction *> actions;
     const QLatin1String searchString = QLatin1String("kwallet ");
+    const QLatin1String shortSearchString = QLatin1String("kwl ");
     const QString defaultMatchId = "kwalletrunner";
     const QRegExp addRegex = QRegExp(QStringLiteral("^kwallet-add ?"));
+    const QRegExp shortAddRegex = QRegExp(QStringLiteral("^kwl-add ?"));
 };
 
 #endif /* KWALLETRUNNER_H */

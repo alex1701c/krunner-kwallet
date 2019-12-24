@@ -52,11 +52,11 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
                              QStringLiteral("kwallet"));
         return;
     }
-
+    const QString query = context.query();
     // Make sure command starts with "kwallet"
-    if (context.query().startsWith(searchString, Qt::CaseInsensitive)) {
+    if (query.startsWith(searchString) || query.startsWith(shortSearchString)) {
         // Get the search term
-        const QString searchTerm = context.query().split(" ", QString::SkipEmptyParts).at(1);
+        const QString searchTerm = query.split(" ", QString::SkipEmptyParts).at(1);
         // Cycle through each folder in our wallet
         for (const QString &folderName: wallet->folderList()) {
 
@@ -80,8 +80,8 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
     }
 
     // KWallet Add
-    if (context.query().contains(addRegex)) {
-        const QString entryName = context.query().remove(addRegex);
+    if (query.contains(addRegex) || query.contains(shortAddRegex)) {
+        const QString entryName = QString(query).remove(addRegex).remove(shortAddRegex);
         // Set to default folder
         wallet->setFolder("");
         const bool entryExists = !entryName.isEmpty() && wallet->hasEntry(entryName);
@@ -97,7 +97,7 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
         } else {
             match.setText(QStringLiteral("Add entry"));
         }
-        match.setData(context.query());
+        match.setData(QStringList({"", entryName}));
         context.addMatch(match);
 
     }
