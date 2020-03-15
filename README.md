@@ -20,9 +20,9 @@ Arch (Manjaro):
 `sudo pacman -S cmake extra-cmake-modules kwallet`
 
 The easiest way to install is:  
-`curl https://raw.githubusercontent.com/alex1701c/JetBrainsRunner/master/install.sh | bash`  
+`curl https://raw.githubusercontent.com/alex1701c/krunner-kwallet/master/install.sh | bash`  
 Or you can install it without admin privileges:  
-`curl https://raw.githubusercontent.com/alex1701c/JetBrainsRunner/master/install-user.sh | bash`  
+`curl https://raw.githubusercontent.com/alex1701c/krunner-kwallet/master/install-user.sh | bash`  
 
 Or you can do it manually (with admin privileges):
 ```
@@ -30,7 +30,7 @@ git clone https://github.com/alex1701c/kwallet-runner
 cd kwallet-runner/
 mkdir build  
 cd build
-cmake -DQT_PLUGIN_INSTALL_DIR=`kf5-config --qt-plugins` ..
+cmake -DQT_PLUGIN_INSTALL_DIR=`kf5-config --qt-plugins` -DCMAKE_BUILD_TYPE=Release ..
 make
 sudo make install
 ```
