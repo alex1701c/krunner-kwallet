@@ -35,17 +35,13 @@ Q_OBJECT
 
 public:
     explicit EditDialog(QWidget *parent = nullptr);
-
     ~EditDialog() override;
 
     bool init(EditDialogData *data);
 
 private slots:
-
     void validateSave();
-
     void validateEntryExists();
-
     void saveEntry();
 
 private:

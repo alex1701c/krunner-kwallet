@@ -15,15 +15,15 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
         Plasma::AbstractRunner(parent, args) {
     Q_UNUSED(args)
 
-    setObjectName(QLatin1String("KWallet"));
+    setObjectName(QStringLiteral("KWallet"));
 
-    // Add the syntax
     addSyntax(Plasma::RunnerSyntax(QStringLiteral("kwallet :q:"),
                                    i18n("Finds all KWallet entries matching :q:")));
-    addSyntax(Plasma::RunnerSyntax(QStringLiteral("kwallet-add :q:"), i18n(R"(Add an entry)")));
+    addSyntax(Plasma::RunnerSyntax(QStringLiteral("kwallet-add :q:"), i18n("Add an entry")));
 
     // Open the wallet
     wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
+    validWallet = Wallet::isEnabled() && wallet;
 
     auto *overview = addAction(QStringLiteral("overview"),
                                QIcon::fromTheme(QStringLiteral("documentinfo")),
@@ -33,9 +33,14 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
                            QIcon::fromTheme(QStringLiteral("document-edit")),
                            QStringLiteral("Edit"));
     edit->setData(QStringLiteral("edit"));
-    actions.clear();
-    actions.append(overview);
-    actions.append(edit);
+    actions = {overview, edit};
+
+    if (!validWallet || !wallet->isOpen()) {
+        KNotification::event(KNotification::Error,
+                             QStringLiteral("KWallet"),
+                             QStringLiteral("Could not open KWallet!"),
+                             QStringLiteral("kwallet"));
+    }
 }
 
 KWalletRunner::~KWalletRunner() {
@@ -43,27 +48,16 @@ KWalletRunner::~KWalletRunner() {
 }
 
 void KWalletRunner::match(Plasma::RunnerContext &context) {
-    if (!context.isValid()) return;
-
-    if (!Wallet::isEnabled() || !wallet->isOpen()) {
-        KNotification::event(KNotification::Error,
-                             QStringLiteral("KWallet"),
-                             QStringLiteral("Could not open KWallet!"),
-                             QStringLiteral("kwallet"));
+    if (!validWallet || !context.isValid() || !wallet->isOpen()) {
         return;
     }
+
     const QString query = context.query();
     // Make sure command starts with "kwallet"
     if (query.startsWith(searchString) || query.startsWith(shortSearchString)) {
-        // Get the search term
-        const QString searchTerm = query.split(" ", QString::SkipEmptyParts).at(1);
-        // Cycle through each folder in our wallet
+        const QString searchTerm = query.split(QChar(' '), QString::SkipEmptyParts).at(1);
         for (const QString &folderName: wallet->folderList()) {
-
-            // Set the folder
             wallet->setFolder(folderName);
-
-            // Cycle through each entry
             for (const QString &entryName: wallet->entryList()) {
                 if (entryName.contains(searchTerm, Qt::CaseInsensitive)) {
                     Plasma::QueryMatch match(this);
@@ -72,18 +66,15 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
                     match.setText(entryName);
                     match.setSubtext(folderName);
                     match.setData(QStringList({folderName, entryName}));
-                    match.setId("");
+                    match.setId(QString());
                     context.addMatch(match);
                 }
             }
         }
-    }
-
-    // KWallet Add
-    if (query.contains(addRegex) || query.contains(shortAddRegex)) {
+    } else if (query.contains(addRegex) || query.contains(shortAddRegex)) {
         const QString entryName = QString(query).remove(addRegex).remove(shortAddRegex);
         // Set to default folder
-        wallet->setFolder("");
+        wallet->setFolder(QString());
         const bool entryExists = !entryName.isEmpty() && wallet->hasEntry(entryName);
 
         Plasma::QueryMatch match(this);
@@ -97,9 +88,8 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
         } else {
             match.setText(QStringLiteral("Add entry"));
         }
-        match.setData(QStringList({"", entryName}));
+        match.setData(QStringList({QString(), entryName}));
         context.addMatch(match);
-
     }
 }
 
@@ -109,7 +99,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
 
     // If we are adding or editing an entry
     if (match.type() == Plasma::QueryMatch::HelperMatch ||
-        (match.selectedAction() != nullptr && match.selectedAction()->data().toString() == QLatin1String("edit"))) {
+        (match.selectedAction() && match.selectedAction()->data().toString() == QLatin1String("edit"))) {
         const QStringList matchData = match.data().toStringList();
         auto *data = new EditDialogData(QString(matchData.at(1)).remove(addRegex), matchData.at(0));
         wallet->setFolder(data->folder);
@@ -121,11 +111,11 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
             } else {
                 KNotification::event(KNotification::Error,
                                      QStringLiteral("KWallet"),
-                                     QStringLiteral("Can not edit entry, please use the KwalletManager tool for this !"),
+                                     QStringLiteral(
+                                             "Can not edit entry, please use the KwalletManager tool for this !"),
                                      QStringLiteral("kwallet"));
                 return;
             }
-
         }
         QTimer::singleShot(0, data, [data]() {
             EditDialog addDialog;
@@ -137,7 +127,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
     }
 
         // Default case
-    else if (match.selectedAction() == nullptr) {
+    else if (!match.selectedAction()) {
         wallet->setFolder(match.subtext());
         const Wallet::EntryType entryType = wallet->entryType(match.text());
         if (entryType == Wallet::Password) {
@@ -178,7 +168,7 @@ void KWalletRunner::setClipboardPassword(const QString &password) {
     cb->setText(password);
     QTimer::singleShot(5000, cb, [cb]() {
         // Clipboard managers might cause the clear function to not work properly
-        cb->setText("");
+        cb->setText(QString());
     });
 }
 

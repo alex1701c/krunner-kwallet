@@ -29,22 +29,16 @@ public:
 class EntryDialog : public QDialog {
 Q_OBJECT
 
-
 public:
     explicit EntryDialog(QWidget *parent = nullptr);
-
     ~EntryDialog() override;
 
     bool init(const EntryDialogData *data);
-
     QToolButton *createCopyToolButton(const QVariant &property);
-
     QLineEdit *createDisplayLine(const QString &text);
-
     QLabel *createLabel(const QString &text);
 
 private slots:
-
     void copyToClipboard();
 
 private:
