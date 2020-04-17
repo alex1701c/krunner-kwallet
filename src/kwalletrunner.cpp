@@ -23,7 +23,6 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
 
     // Open the wallet
     wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
-    validWallet = Wallet::isEnabled() && wallet;
 
     auto *overview = addAction(QStringLiteral("overview"),
                                QIcon::fromTheme(QStringLiteral("documentinfo")),
@@ -35,12 +34,14 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
     edit->setData(QStringLiteral("edit"));
     actions = {overview, edit};
 
+    const bool validWallet = Wallet::isEnabled() && wallet;
     if (!validWallet || !wallet->isOpen()) {
         KNotification::event(KNotification::Error,
                              QStringLiteral("KWallet"),
                              QStringLiteral("Could not open KWallet!"),
                              QStringLiteral("kwallet"));
     }
+    matchingSuspended(!validWallet);
 }
 
 KWalletRunner::~KWalletRunner() {
@@ -48,7 +49,7 @@ KWalletRunner::~KWalletRunner() {
 }
 
 void KWalletRunner::match(Plasma::RunnerContext &context) {
-    if (!validWallet || !context.isValid() || !wallet->isOpen()) {
+    if (!context.isValid() || !wallet->isOpen()) {
         return;
     }
 
@@ -117,7 +118,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
                 return;
             }
         }
-        QTimer::singleShot(0, data, [data]() {
+        QTimer::singleShot(0, [data]() {
             EditDialog addDialog;
             addDialog.init(data);
             addDialog.exec();
@@ -166,7 +167,7 @@ QList<QAction *> KWalletRunner::actionsForMatch(const Plasma::QueryMatch &match)
 void KWalletRunner::setClipboardPassword(const QString &password) {
     QClipboard *cb = QApplication::clipboard();
     cb->setText(password);
-    QTimer::singleShot(5000, cb, [cb]() {
+    QTimer::singleShot(5000, [cb]() {
         // Clipboard managers might cause the clear function to not work properly
         cb->setText(QString());
     });

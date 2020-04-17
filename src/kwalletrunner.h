@@ -33,7 +33,6 @@ private:
     const QLatin1String defaultMatchId = QLatin1String("kwalletrunner");
     const QRegularExpression addRegex = QRegularExpression(QStringLiteral("^kwallet-add ?"));
     const QRegularExpression shortAddRegex = QRegularExpression(QStringLiteral("^kwl-add ?"));
-    bool validWallet;
 };
 
 #endif /* KWALLETRUNNER_H */

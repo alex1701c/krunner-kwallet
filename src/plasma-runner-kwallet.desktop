@@ -73,6 +73,6 @@ X-KDE-Library=krunner_kwallet
 X-KDE-PluginInfo-Author=alex1701c
 X-KDE-PluginInfo-Email=alex1701c.dev@gmx.net
 X-KDE-PluginInfo-Name=kwalletrunner
-X-KDE-PluginInfo-Version=0.1
+X-KDE-PluginInfo-Version=1.0.0
 X-KDE-PluginInfo-License=GPL
 X-KDE-PluginInfo-EnabledByDefault=true
