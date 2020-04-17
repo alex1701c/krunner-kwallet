@@ -147,7 +147,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
 
     // Fallback case
     const auto *data = new EntryDialogData(match.subtext(), match.text());
-    QTimer::singleShot(0, data, [data]() {
+    QTimer::singleShot(0,  [data]() {
         EntryDialog entryDialog;
         if (entryDialog.init(data)) {
             entryDialog.exec();
