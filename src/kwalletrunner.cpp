@@ -41,7 +41,7 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
                              QStringLiteral("Could not open KWallet!"),
                              QStringLiteral("kwallet"));
     }
-    matchingSuspended(!validWallet);
+    suspendMatching(!validWallet);
 }
 
 KWalletRunner::~KWalletRunner() {
