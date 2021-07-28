@@ -2,7 +2,7 @@ set(runner_SRCS kwalletrunner.cpp entrydialog/entrydialog.cpp editdialog/editdia
 ki18n_wrap_ui(runner_SRCS entrydialog/entrydialog.ui)
 ki18n_wrap_ui(runner_SRCS editdialog/editdialog.ui)
 
-add_library(krunner_kwallet MODULE ${runner_SRCS})
+kcoreaddons_add_plugin(krunner_kwallet SOURCES ${runner_SRCS} INSTALL_NAMESPACE "kf5/krunner")
 target_link_libraries(krunner_kwallet
                       Qt5::Widgets
                       KF5::CoreAddons
@@ -11,6 +11,3 @@ target_link_libraries(krunner_kwallet
                       KF5::Service
                       KF5::Runner
                       KF5::Wallet)
-
-install(TARGETS krunner_kwallet DESTINATION ${PLUGIN_INSTALL_DIR})
-install(FILES plasma-runner-kwallet.desktop DESTINATION ${SERVICES_INSTALL_DIR})

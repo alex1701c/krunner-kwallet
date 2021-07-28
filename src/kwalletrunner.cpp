@@ -172,6 +172,6 @@ void KWalletRunner::setClipboardPassword(const QString &password) {
 }
 
 
-K_EXPORT_PLASMA_RUNNER(kwallet, KWalletRunner)
+K_EXPORT_PLASMA_RUNNER_WITH_JSON(KWalletRunner, "kwalletrunner.json")
 
 #include "kwalletrunner.moc"
