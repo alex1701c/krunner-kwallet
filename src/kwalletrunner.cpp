@@ -3,7 +3,6 @@
 
 #include <QDebug>
 #include <QTimer>
-#include <KLocalizedString>
 #include <KNotifications/KNotification>
 #include <KShell>
 #include <QAction>
@@ -16,11 +15,12 @@ KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const
     setObjectName(QStringLiteral("KWallet"));
 
     addSyntax(Plasma::RunnerSyntax(QStringLiteral("kwallet :q:"),
-                                   i18n("Finds all KWallet entries matching :q:")));
-    addSyntax(Plasma::RunnerSyntax(QStringLiteral("kwallet-add :q:"), i18n("Add an entry")));
+                                   QStringLiteral("Finds all KWallet entries matching :q:")));
+    addSyntax(Plasma::RunnerSyntax(QStringLiteral("kwallet-add :q:"), QStringLiteral("Add an entry")));
 
     // Open the wallet
     wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
+    wallet->setParent(this);
 
     auto *overview = new QAction(QIcon::fromTheme(QStringLiteral("documentinfo")),
                                QStringLiteral("Show Overview"));
@@ -38,10 +38,6 @@ KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const
                              QStringLiteral("kwallet"));
     suspendMatching(true);
     }
-}
-
-KWalletRunner::~KWalletRunner() {
-    delete wallet;
 }
 
 void KWalletRunner::match(Plasma::RunnerContext &context) {

@@ -16,8 +16,7 @@ class KWalletRunner : public Plasma::AbstractRunner {
 Q_OBJECT
 
 public:
-    KWalletRunner(QObject *parent, const KPluginMetaData &data,const QVariantList &args);
-    ~KWalletRunner() override;
+    KWalletRunner(QObject *parent, const KPluginMetaData &data, const QVariantList &args);
 
     void match(Plasma::RunnerContext &context) override;
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;

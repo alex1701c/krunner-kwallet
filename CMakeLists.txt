@@ -21,14 +21,8 @@ find_package(KF5 ${KF5_VERSION} REQUIRED
     I18n
     CoreAddons
     Notifications
-    Service
     Runner
     Wallet
-)
-
-include_directories(
-   ${CMAKE_SOURCE_DIR}
-   ${CMAKE_BINARY_DIR}
 )
 
 add_subdirectory(src)
