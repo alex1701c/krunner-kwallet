@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.16)
 
 project(KWalletRunner)
 
@@ -7,7 +7,7 @@ find_package(ECM ${KF5_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
 # Find the required Libaries
-find_package(Qt5 5.12.0 CONFIG REQUIRED Widgets)
+find_package(Qt5 5.14.0 CONFIG REQUIRED Widgets)
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)
