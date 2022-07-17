@@ -36,8 +36,8 @@ KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const
                              QStringLiteral("KWallet"),
                              QStringLiteral("Could not open KWallet!"),
                              QStringLiteral("kwallet"));
+    suspendMatching(true);
     }
-    suspendMatching(!validWallet);
 }
 
 KWalletRunner::~KWalletRunner() {
@@ -45,10 +45,6 @@ KWalletRunner::~KWalletRunner() {
 }
 
 void KWalletRunner::match(Plasma::RunnerContext &context) {
-    if (!context.isValid() || !wallet->isOpen()) {
-        return;
-    }
-
     const QString query = context.query();
     // Make sure command starts with "kwallet"
     if (query.startsWith(searchString) || query.startsWith(shortSearchString)) {
