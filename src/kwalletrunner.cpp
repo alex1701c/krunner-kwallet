@@ -11,8 +11,8 @@
 #include <QClipboard>
 
 
-KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
-        Plasma::AbstractRunner(parent, args) {
+KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const QVariantList &args) :
+        Plasma::AbstractRunner(parent, data, args) {
     setObjectName(QStringLiteral("KWallet"));
 
     addSyntax(Plasma::RunnerSyntax(QStringLiteral("kwallet :q:"),
@@ -22,12 +22,10 @@ KWalletRunner::KWalletRunner(QObject *parent, const QVariantList &args) :
     // Open the wallet
     wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
 
-    auto *overview = addAction(QStringLiteral("overview"),
-                               QIcon::fromTheme(QStringLiteral("documentinfo")),
+    auto *overview = new QAction(QIcon::fromTheme(QStringLiteral("documentinfo")),
                                QStringLiteral("Show Overview"));
     overview->setData(QStringLiteral("overview"));
-    auto *edit = addAction(QStringLiteral("overview"),
-                           QIcon::fromTheme(QStringLiteral("document-edit")),
+    auto *edit = new QAction(QIcon::fromTheme(QStringLiteral("document-edit")),
                            QStringLiteral("Edit"));
     edit->setData(QStringLiteral("edit"));
     actions = {overview, edit};
@@ -54,7 +52,7 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
     const QString query = context.query();
     // Make sure command starts with "kwallet"
     if (query.startsWith(searchString) || query.startsWith(shortSearchString)) {
-        const QString searchTerm = query.split(QChar(' '), QString::SkipEmptyParts).at(1);
+        const QString searchTerm = query.split(QChar(' '), Qt::SkipEmptyParts).at(1);
         for (const QString &folderName: wallet->folderList()) {
             wallet->setFolder(folderName);
             for (const QString &entryName: wallet->entryList()) {
