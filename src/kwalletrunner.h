@@ -1,6 +1,6 @@
 //  Licensed under the GNU GENERAL PUBLIC LICENSE Version 3. See License in the project root for license information.
-#ifndef KWALLETRUNNER_H
-#define KWALLETRUNNER_H
+
+#pragma once
 
 #include <KRunner/AbstractRunner>
 #include <KWallet/KWallet>
@@ -27,11 +27,9 @@ public:
 private:
     Wallet *wallet;
     QList<QAction *> actions;
-    const QLatin1String searchString = QLatin1String("kwallet ");
-    const QLatin1String shortSearchString = QLatin1String("kwl ");
-    const QLatin1String defaultMatchId = QLatin1String("kwalletrunner");
-    const QRegularExpression addRegex = QRegularExpression(QStringLiteral("^kwallet-add ?"));
-    const QRegularExpression shortAddRegex = QRegularExpression(QStringLiteral("^kwl-add ?"));
+    const QLatin1String searchString{"kwallet "};
+    const QLatin1String shortSearchString{"kwl "};
+    const QLatin1String defaultMatchId{"kwalletrunner"};
+    const QRegularExpression addRegex{QStringLiteral("^kwallet-add ?")};
+    const QRegularExpression shortAddRegex{QStringLiteral("^kwl-add ?")};
 };
-
-#endif /* KWALLETRUNNER_H */
