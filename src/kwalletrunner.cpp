@@ -87,9 +87,7 @@ void KWalletRunner::match(Plasma::RunnerContext &context) {
 }
 
 
-void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) {
-    Q_UNUSED(context)
-
+void KWalletRunner::run(const Plasma::RunnerContext &/*context*/, const Plasma::QueryMatch &match) {
     // If we are adding or editing an entry
     if (match.type() == Plasma::QueryMatch::HelperMatch ||
         (match.selectedAction() && match.selectedAction()->data().toString() == QLatin1String("edit"))) {
@@ -110,7 +108,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
                 return;
             }
         }
-        QTimer::singleShot(0, [data]() {
+        QTimer::singleShot(0, this, [data]() {
             EditDialog addDialog;
             addDialog.init(data);
             addDialog.exec();
@@ -140,7 +138,7 @@ void KWalletRunner::run(const Plasma::RunnerContext &context, const Plasma::Quer
 
     // Fallback case
     const auto *data = new EntryDialogData(match.subtext(), match.text());
-    QTimer::singleShot(0,  [data]() {
+    QTimer::singleShot(0, this,  [data]() {
         EntryDialog entryDialog;
         if (entryDialog.init(data)) {
             entryDialog.exec();
@@ -153,13 +151,13 @@ QList<QAction *> KWalletRunner::actionsForMatch(const Plasma::QueryMatch &match)
     if (match.id() == defaultMatchId) {
         return actions;
     }
-    return QList<QAction *>();
+    return {};
 }
 
 void KWalletRunner::setClipboardPassword(const QString &password) {
     QClipboard *cb = QApplication::clipboard();
     cb->setText(password);
-    QTimer::singleShot(5000, [cb]() {
+    QTimer::singleShot(5000, this, [cb]() {
         // Clipboard managers might cause the clear function to not work properly
         cb->setText(QString());
     });

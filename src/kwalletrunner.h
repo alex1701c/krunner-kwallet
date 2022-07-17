@@ -23,7 +23,7 @@ public:
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
     QList<QAction *> actionsForMatch(const Plasma::QueryMatch &match) override;
 
-    static void setClipboardPassword(const QString &password);
+    void setClipboardPassword(const QString &password);
 
 private:
     Wallet *wallet;
