@@ -12,15 +12,15 @@
 
 using KWallet::Wallet;
 
-class KWalletRunner : public Plasma::AbstractRunner {
+class KWalletRunner : public KRunner::AbstractRunner {
 Q_OBJECT
 
 public:
     KWalletRunner(QObject *parent, const KPluginMetaData &data, const QVariantList &args);
 
-    void match(Plasma::RunnerContext &context) override;
-    void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
-    QList<QAction *> actionsForMatch(const Plasma::QueryMatch &match) override;
+    void match(KRunner::RunnerContext &context) override;
+    void run(const KRunner::RunnerContext &context, const KRunner::QueryMatch &match) override;
+    QList<QAction *> actionsForMatch(const KRunner::QueryMatch &match) override;
 
     void setClipboardPassword(const QString &password);
 

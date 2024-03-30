@@ -2,27 +2,34 @@ cmake_minimum_required(VERSION 3.16)
 
 project(KWalletRunner)
 
-set(KF5_VERSION "5.72.0")
-find_package(ECM ${KF5_VERSION} REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+set(QT_MIN_VERSION 5.15.0)
+set(KF_MIN_VERSION 5.105.0)
+set(KDE_COMPILERSETTINGS_LEVEL 5.82.0)
 
-# Find the required Libaries
-find_package(Qt5 5.14.0 CONFIG REQUIRED Widgets)
+find_package(ECM ${KF_MIN_VERSION} REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(FeatureSummary)
 include(ECMInstallIcons)
-include(ECMAddAppIcon)
 include(ECMSetupVersion)
+include(QtVersionOption)
+include(ECMDeprecationSettings)
 
-find_package(KF5 ${KF5_VERSION} REQUIRED
+find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} CONFIG REQUIRED Widgets)
+find_package(KF${QT_MAJOR_VERSION} ${KF5_VERSION} REQUIRED
     I18n
     CoreAddons
     Notifications
     Runner
     Wallet
+)
+
+ecm_set_disabled_deprecation_versions(
+	KF ${KF_MIN_VERSION}
+	QT ${QT_MIN_VERSION}
 )
 
 add_subdirectory(src)
