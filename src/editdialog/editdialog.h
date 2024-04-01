@@ -3,12 +3,12 @@
 #define ADDDIALOG_H
 
 #include <QDialog>
-#include <KWallet/KWallet>
+#include <KWallet>
 #include <utility>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QLabel>
-#include <KNotifications/KNotification>
+#include <QToolButton>
+#include <QLineEdit>
+#include <QLabel>
+#include <KNotification>
 
 using KWallet::Wallet;
 

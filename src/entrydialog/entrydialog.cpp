@@ -10,7 +10,7 @@
 #include <QLineEdit>
 #include <QToolButton>
 #include <QDebug>
-#include <KNotifications/KNotification>
+#include <KNotification>
 
 EntryDialog::EntryDialog(QWidget *parent) : QDialog(parent), ui(new Ui::EntryDialog) {
     ui->setupUi(this);

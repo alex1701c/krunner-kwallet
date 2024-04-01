@@ -1,9 +1,10 @@
 //  Licensed under the GNU GENERAL PUBLIC LICENSE Version 3. See License in the project root for license information.
 #include "kwalletrunner.h"
 
+#include <krunner_version.h>
 #include <QDebug>
 #include <QTimer>
-#include <KNotifications/KNotification>
+#include <KNotification>
 #include <KShell>
 #include <QAction>
 #include <QApplication>
@@ -11,7 +12,11 @@
 
 
 KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const QVariantList &args) :
+#if QT_VERSION_MAJOR == 5
         KRunner::AbstractRunner(parent, data, args) {
+#else
+        KRunner::AbstractRunner(parent, data) {
+#endif
     addSyntax(KRunner::RunnerSyntax(QStringLiteral("kwallet :q:"),
                                    QStringLiteral("Finds all KWallet entries matching :q:")));
     addSyntax(KRunner::RunnerSyntax(QStringLiteral("kwallet-add :q:"), QStringLiteral("Add an entry")));
@@ -20,6 +25,12 @@ KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const
     wallet = Wallet::openWallet(Wallet::LocalWallet(), 0, Wallet::Synchronous);
     wallet->setParent(this);
 
+#if QT_VERSION_MAJOR==6
+    actions = {
+        KRunner::Action(QStringLiteral("edit"), QStringLiteral("document-edit"), QStringLiteral("Edit")),
+        KRunner::Action(QStringLiteral("overview"), QStringLiteral("documentinfo"), QStringLiteral("Show Overview"))
+    };
+#else
     auto *overview = new QAction(QIcon::fromTheme(QStringLiteral("documentinfo")),
                                QStringLiteral("Show Overview"));
     overview->setData(QStringLiteral("overview"));
@@ -27,6 +38,7 @@ KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const
                            QStringLiteral("Edit"));
     edit->setData(QStringLiteral("edit"));
     actions = {overview, edit};
+#endif
 
     const bool validWallet = Wallet::isEnabled() && wallet;
     if (!validWallet || !wallet->isOpen()) {
@@ -46,14 +58,20 @@ void KWalletRunner::match(KRunner::RunnerContext &context) {
         for (const QString &folderName: wallet->folderList()) {
             wallet->setFolder(folderName);
             for (const QString &entryName: wallet->entryList()) {
+                qWarning()<<entryName;
                 if (entryName.contains(searchTerm, Qt::CaseInsensitive)) {
                     KRunner::QueryMatch match(this);
+#if KRUNNER_VERSION < QT_VERSION_CHECK(5, 113, 0)
                     match.setType(KRunner::QueryMatch::ExactMatch);
+#else
+                    match.setCategoryRelevance(KRunner::QueryMatch::CategoryRelevance::Highest);
+#endif
                     match.setIconName(QStringLiteral("kwalletmanager"));
                     match.setText(entryName);
                     match.setSubtext(folderName);
                     match.setData(QStringList({folderName, entryName}));
                     match.setId(QString());
+                    match.setActions(actions);
                     context.addMatch(match);
                 }
             }
@@ -66,7 +84,11 @@ void KWalletRunner::match(KRunner::RunnerContext &context) {
 
         KRunner::QueryMatch match(this);
         match.setId(entryExists ? QStringLiteral("edit") : QStringLiteral("add"));
-        match.setType(KRunner::QueryMatch::HelperMatch);
+#if KRUNNER_VERSION < QT_VERSION_CHECK(5, 113, 0)
+                    match.setType(KRunner::QueryMatch::ExactMatch);
+#else
+                    match.setCategoryRelevance(KRunner::QueryMatch::CategoryRelevance::Moderate);
+#endif
         match.setIconName(QStringLiteral("kwalletmanager"));
         if (entryExists) {
             match.setText(QStringLiteral("Edit entry for ") % entryName);
@@ -80,11 +102,21 @@ void KWalletRunner::match(KRunner::RunnerContext &context) {
     }
 }
 
+QString getSelectedMatchId(const KRunner::QueryMatch &match) {
+    if (!match.selectedAction()) {
+        return QString();
+    }
+#if QT_VERSION_MAJOR == 5
+    return match.selectedAction()->data().toString();
+#else
+    return match.selectedAction().id();
+#endif
+}
 
 void KWalletRunner::run(const KRunner::RunnerContext &/*context*/, const KRunner::QueryMatch &match) {
     // If we are adding or editing an entry
-    if (match.type() == KRunner::QueryMatch::HelperMatch ||
-        (match.selectedAction() && match.selectedAction()->data().toString() == QLatin1String("edit"))) {
+    if (//match.type() == KRunner::QueryMatch::HelperMatch ||
+        (getSelectedMatchId(match) == QLatin1String("edit"))) {
         const QStringList matchData = match.data().toStringList();
         auto *data = new EditDialogData(QString(matchData.at(1)).remove(addRegex), matchData.at(0));
         wallet->setFolder(data->folder);
@@ -111,8 +143,8 @@ void KWalletRunner::run(const KRunner::RunnerContext &/*context*/, const KRunner
         return;
     }
 
-        // Default case
     else if (!match.selectedAction()) {
+        // Default case
         wallet->setFolder(match.subtext());
         const Wallet::EntryType entryType = wallet->entryType(match.text());
         if (entryType == Wallet::Password) {
@@ -139,13 +171,6 @@ void KWalletRunner::run(const KRunner::RunnerContext &/*context*/, const KRunner
         }
         delete data;
     });
-}
-
-QList<QAction *> KWalletRunner::actionsForMatch(const KRunner::QueryMatch &match) {
-    if (match.id() == defaultMatchId) {
-        return actions;
-    }
-    return {};
 }
 
 void KWalletRunner::setClipboardPassword(const QString &password) {

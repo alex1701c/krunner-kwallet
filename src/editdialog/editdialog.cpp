@@ -7,7 +7,7 @@
 #include <QLineEdit>
 #include <QDebug>
 #include <QPushButton>
-#include <KNotifications/KNotification>
+#include <KNotification>
 #include <QStringBuilder>
 
 EditDialog::EditDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddDialog) {

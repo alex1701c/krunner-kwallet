@@ -3,11 +3,11 @@
 #define ENTRYDIALOG_H
 
 #include <QDialog>
-#include <KWallet/KWallet>
+#include <KWallet>
 #include <utility>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QLabel>
+#include <QToolButton>
+#include <QLineEdit>
+#include <QLabel>
 
 using KWallet::Wallet;
 
