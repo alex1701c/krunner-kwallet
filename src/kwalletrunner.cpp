@@ -11,11 +11,10 @@
 #include <krunner_version.h>
 
 KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const QVariantList &args)
-    :
 #if QT_VERSION_MAJOR == 5
-    KRunner::AbstractRunner(parent, data, args)
+    : KRunner::AbstractRunner(parent, data, args)
 #else
-    KRunner::AbstractRunner(parent, data)
+    : KRunner::AbstractRunner(parent, data)
 #endif
 {
     addSyntax(KRunner::RunnerSyntax(QStringLiteral("kwallet :q:"), QStringLiteral("Finds all KWallet entries matching :q:")));
@@ -183,3 +182,4 @@ void KWalletRunner::setClipboardPassword(const QString &password)
 K_PLUGIN_CLASS_WITH_JSON(KWalletRunner, "kwalletrunner.json")
 
 #include "kwalletrunner.moc"
+#include "moc_kwalletrunner.cpp"

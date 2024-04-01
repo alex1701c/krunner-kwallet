@@ -68,3 +68,5 @@ void EditDialog::validateEntryExists()
 {
     ui->label->setHidden(!wallet->hasEntry(ui->nameLineEdit->text()));
 }
+
+#include "moc_editdialog.cpp"

@@ -120,3 +120,5 @@ QLabel *EntryDialog::createLabel(const QString &text)
     label->setTextInteractionFlags(Qt::TextInteractionFlag::TextSelectableByKeyboard | Qt::TextInteractionFlag::TextSelectableByMouse);
     return label;
 }
+
+#include "moc_entrydialog.cpp"
