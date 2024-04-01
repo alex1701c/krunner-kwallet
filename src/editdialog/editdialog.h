@@ -2,36 +2,41 @@
 #ifndef ADDDIALOG_H
 #define ADDDIALOG_H
 
-#include <QDialog>
-#include <KWallet>
-#include <utility>
-#include <QToolButton>
-#include <QLineEdit>
-#include <QLabel>
 #include <KNotification>
+#include <KWallet>
+#include <QDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QToolButton>
+#include <utility>
 
 using KWallet::Wallet;
 
-namespace Ui {
-    class AddDialog;
+namespace Ui
+{
+class AddDialog;
 }
 
-class EditDialogData : public QObject {
-Q_OBJECT
+class EditDialogData : public QObject
+{
+    Q_OBJECT
 public:
     const QString name;
     const QString folder;
     QString value;
 
 public:
-    explicit EditDialogData(QString name = "", QString folder = "", QObject *parent = nullptr) :
-            QObject(parent), name(std::move(name)), folder(std::move(folder)) {}
+    explicit EditDialogData(QString name = "", QString folder = "", QObject *parent = nullptr)
+        : QObject(parent)
+        , name(std::move(name))
+        , folder(std::move(folder))
+    {
+    }
 };
 
-
-class EditDialog : public QDialog {
-Q_OBJECT
-
+class EditDialog : public QDialog
+{
+    Q_OBJECT
 
 public:
     explicit EditDialog(QWidget *parent = nullptr);

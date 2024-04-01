@@ -2,32 +2,39 @@
 #ifndef ENTRYDIALOG_H
 #define ENTRYDIALOG_H
 
-#include <QDialog>
 #include <KWallet>
-#include <utility>
-#include <QToolButton>
-#include <QLineEdit>
+#include <QDialog>
 #include <QLabel>
+#include <QLineEdit>
+#include <QToolButton>
+#include <utility>
 
 using KWallet::Wallet;
 
-namespace Ui {
-    class EntryDialog;
+namespace Ui
+{
+class EntryDialog;
 }
 
-class EntryDialogData : public QObject {
-Q_OBJECT
+class EntryDialogData : public QObject
+{
+    Q_OBJECT
 public:
     const QString folder;
     const QString entry;
 
 public:
-    EntryDialogData(QString folder, QString entry, QObject *parent = nullptr) : QObject(parent), folder(std::move(folder)),
-                                                                                entry(std::move(entry)) {}
+    EntryDialogData(QString folder, QString entry, QObject *parent = nullptr)
+        : QObject(parent)
+        , folder(std::move(folder))
+        , entry(std::move(entry))
+    {
+    }
 };
 
-class EntryDialog : public QDialog {
-Q_OBJECT
+class EntryDialog : public QDialog
+{
+    Q_OBJECT
 
 public:
     explicit EntryDialog(QWidget *parent = nullptr);

@@ -17,6 +17,7 @@ include(ECMInstallIcons)
 include(ECMSetupVersion)
 include(QtVersionOption)
 include(ECMDeprecationSettings)
+include(KDEClangFormat)
 
 find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} CONFIG REQUIRED Widgets)
 find_package(KF${QT_MAJOR_VERSION} ${KF5_VERSION} REQUIRED

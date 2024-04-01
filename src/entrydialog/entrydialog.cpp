@@ -2,26 +2,31 @@
 #include "entrydialog.h"
 #include "ui_entrydialog.h"
 
-#include <QClipboard>
+#include <KNotification>
 #include <QApplication>
+#include <QClipboard>
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QToolButton>
-#include <QDebug>
-#include <KNotification>
 
-EntryDialog::EntryDialog(QWidget *parent) : QDialog(parent), ui(new Ui::EntryDialog) {
+EntryDialog::EntryDialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::EntryDialog)
+{
     ui->setupUi(this);
     connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &EntryDialog::close);
 }
 
-EntryDialog::~EntryDialog() {
+EntryDialog::~EntryDialog()
+{
     delete ui;
 }
 
-bool EntryDialog::init(const EntryDialogData *data) {
+bool EntryDialog::init(const EntryDialogData *data)
+{
     // Set titles
     setWindowTitle(QStringLiteral("KWallet Entry"));
     ui->entryBox->setTitle(data->entry);
@@ -29,10 +34,7 @@ bool EntryDialog::init(const EntryDialogData *data) {
     // Open an instance of the wallet and set the folder
     Wallet *wallet = Wallet::openWallet(Wallet::LocalWallet(), winId(), Wallet::Synchronous);
     if (!wallet->isOpen()) {
-        KNotification::event(KNotification::Error,
-                             QStringLiteral("KWallet"),
-                             QStringLiteral("Could not open KWallet!"),
-                             QStringLiteral("kwalletmanager"));
+        KNotification::event(KNotification::Error, QStringLiteral("KWallet"), QStringLiteral("Could not open KWallet!"), QStringLiteral("kwalletmanager"));
         return false;
     }
     wallet->setFolder(data->folder);
@@ -88,19 +90,22 @@ bool EntryDialog::init(const EntryDialogData *data) {
     return true;
 }
 
-void EntryDialog::copyToClipboard() {
+void EntryDialog::copyToClipboard()
+{
     const QString value = QObject::sender()->property("value").toString();
     QApplication::clipboard()->setText(value);
 }
 
-QLineEdit *EntryDialog::createDisplayLine(const QString &text) {
+QLineEdit *EntryDialog::createDisplayLine(const QString &text)
+{
     auto *lineEdit = new QLineEdit(this);
     lineEdit->setText(text);
     lineEdit->setReadOnly(true);
     return lineEdit;
 }
 
-QToolButton *EntryDialog::createCopyToolButton(const QVariant &property) {
+QToolButton *EntryDialog::createCopyToolButton(const QVariant &property)
+{
     auto *copyButton = new QToolButton(this);
     copyButton->setIcon(QIcon::fromTheme(QStringLiteral("edit-copy")));
     copyButton->setProperty("value", property);
@@ -108,11 +113,10 @@ QToolButton *EntryDialog::createCopyToolButton(const QVariant &property) {
     return copyButton;
 }
 
-QLabel *EntryDialog::createLabel(const QString &text) {
+QLabel *EntryDialog::createLabel(const QString &text)
+{
     auto *label = new QLabel(this);
     label->setText(text);
-    label->setTextInteractionFlags(Qt::TextInteractionFlag::TextSelectableByKeyboard |
-                                   Qt::TextInteractionFlag::TextSelectableByMouse);
+    label->setTextInteractionFlags(Qt::TextInteractionFlag::TextSelectableByKeyboard | Qt::TextInteractionFlag::TextSelectableByMouse);
     return label;
 }
-

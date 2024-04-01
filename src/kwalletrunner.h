@@ -4,20 +4,21 @@
 
 #include <KRunner/AbstractRunner>
 #include <KWallet>
-#include <QStringBuilder>
 #include <QRegularExpression>
+#include <QStringBuilder>
 
-#include <editdialog/editdialog.h>
 #include "entrydialog/entrydialog.h"
+#include <editdialog/editdialog.h>
 
-#if QT_VERSION_MAJOR==6
+#if QT_VERSION_MAJOR == 6
 #include <KRunner/Action>
 #endif
 
 using KWallet::Wallet;
 
-class KWalletRunner : public KRunner::AbstractRunner {
-Q_OBJECT
+class KWalletRunner : public KRunner::AbstractRunner
+{
+    Q_OBJECT
 
 public:
     KWalletRunner(QObject *parent, const KPluginMetaData &data, const QVariantList &args);
@@ -29,7 +30,7 @@ public:
 
 private:
     Wallet *wallet;
-#if QT_VERSION_MAJOR==5
+#if QT_VERSION_MAJOR == 5
     QList<QAction *> actions;
 #else
     QList<KRunner::Action> actions;
