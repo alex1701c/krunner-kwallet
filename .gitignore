@@ -1,8 +1,10 @@
 *.kdev4
 *~
 /build*
+.cache
 *.user
 .idea
 cmake-build-debug
 src/*/ui_*.h
 compile_commands.json
+.clang-format
