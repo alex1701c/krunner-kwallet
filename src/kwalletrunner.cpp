@@ -4,9 +4,9 @@
 #include <KNotification>
 #include <KShell>
 #include <QAction>
-#include <QApplication>
 #include <QClipboard>
 #include <QDebug>
+#include <QGuiApplication>
 #include <QTimer>
 #include <krunner_version.h>
 
@@ -86,9 +86,9 @@ void KWalletRunner::match(KRunner::RunnerContext &context)
 #endif
         match.setIconName(QStringLiteral("kwalletmanager"));
         if (entryExists) {
-            match.setText(QStringLiteral("Edit entry for ") % entryName);
+            match.setText(QStringLiteral("Edit entry for ") + entryName);
         } else if (!entryName.isEmpty()) {
-            match.setText(QStringLiteral("Add entry for ") % entryName);
+            match.setText(QStringLiteral("Add entry for ") + entryName);
         } else {
             match.setText(QStringLiteral("Add entry"));
         }
@@ -171,7 +171,7 @@ void KWalletRunner::run(const KRunner::RunnerContext & /*context*/, const KRunne
 
 void KWalletRunner::setClipboardPassword(const QString &password)
 {
-    QClipboard *cb = QApplication::clipboard();
+    QClipboard *cb = QGuiApplication::clipboard();
     cb->setText(password);
     QTimer::singleShot(5000, this, [cb]() {
         // Clipboard managers might cause the clear function to not work properly

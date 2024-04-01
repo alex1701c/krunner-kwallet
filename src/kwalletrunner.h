@@ -5,10 +5,9 @@
 #include <KRunner/AbstractRunner>
 #include <KWallet>
 #include <QRegularExpression>
-#include <QStringBuilder>
 
+#include "editdialog/editdialog.h"
 #include "entrydialog/entrydialog.h"
-#include <editdialog/editdialog.h>
 
 #if QT_VERSION_MAJOR == 6
 #include <KRunner/Action>
