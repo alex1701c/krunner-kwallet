@@ -17,6 +17,7 @@ KWalletRunner::KWalletRunner(QObject *parent, const KPluginMetaData &data, const
     : KRunner::AbstractRunner(parent, data)
 #endif
 {
+    Q_UNUSED(args)
     addSyntax(KRunner::RunnerSyntax(QStringLiteral("kwallet :q:"), QStringLiteral("Finds all KWallet entries matching :q:")));
     addSyntax(KRunner::RunnerSyntax(QStringLiteral("kwallet-add :q:"), QStringLiteral("Add an entry")));
 
@@ -53,7 +54,6 @@ void KWalletRunner::match(KRunner::RunnerContext &context)
         for (const QString &folderName : wallet->folderList()) {
             wallet->setFolder(folderName);
             for (const QString &entryName : wallet->entryList()) {
-                qWarning() << entryName;
                 if (entryName.contains(searchTerm, Qt::CaseInsensitive)) {
                     KRunner::QueryMatch match(this);
 #if KRUNNER_VERSION < QT_VERSION_CHECK(5, 113, 0)
@@ -130,7 +130,7 @@ void KWalletRunner::run(const KRunner::RunnerContext & /*context*/, const KRunne
                 return;
             }
         }
-        QTimer::singleShot(0, this, [data]() {
+        QTimer::singleShot(0, QCoreApplication::instance(), [data]() {
             EditDialog addDialog;
             addDialog.init(data);
             addDialog.exec();
@@ -160,7 +160,7 @@ void KWalletRunner::run(const KRunner::RunnerContext & /*context*/, const KRunne
 
     // Fallback case
     const auto *data = new EntryDialogData(match.subtext(), match.text());
-    QTimer::singleShot(0, this, [data]() {
+    QTimer::singleShot(0, QCoreApplication::instance(), [data]() {
         EntryDialog entryDialog;
         if (entryDialog.init(data)) {
             entryDialog.exec();
