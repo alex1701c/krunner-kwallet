@@ -30,5 +30,5 @@ then
     killall krunner
 fi
 
-echo "Installation finished !";
+echo "Installation finished!";
 

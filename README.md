@@ -4,7 +4,7 @@ This plugin allows you to copy/show/add/edit passwords from KWallet.
 
 This is a fork from https://github.com/jimtendo/kwallet-runner but has extra features added and deprecated code removed.  
 
-Required Dependencies
+Required Dependencies (Qt5)
 ----------------------
 
 Debian/Ubuntu:  
@@ -22,21 +22,12 @@ Arch (Manjaro):
 The easiest way to install is:  
 `curl https://raw.githubusercontent.com/alex1701c/krunner-kwallet/master/install.sh | bash`  
 
-Or you can do it manually (with admin privileges):
-```
-git clone https://github.com/alex1701c/kwallet-runner
-cd kwallet-runner/
-mkdir build  
-cd build
-cmake -DQT_PLUGIN_INSTALL_DIR=`kf5-config --qt-plugins` -DCMAKE_BUILD_TYPE=Release ..
-make
-sudo make install
-```
+You may also 
 
 Restart krunner to load the runner (in a terminal type: kquitapp5 krunner;kstart5 krunner )
 
 ### Screenshots  
-You can search for entries. And copy the password (default action), 
+You can search for entries and copy the password (default action), 
 show the password in a dialog info button(Shift+Return) or edit it.  
 To add a new password type kwallet-add  
 ![Overview](https://raw.githubusercontent.com/alex1701c/Screenshots/master/krunner-kwallet/overview.png)
