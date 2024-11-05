@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(kwallet)
-set(CMAKE_PROJECT_VERSION "1.1.0")
+set(CMAKE_PROJECT_VERSION "1.1.1")
 set(CMAKE_PROJECT_HOMEPAGE_URL "https://github.com/alex1701c/JetBrainsRunner")
 set(CMAKE_PROJECT_AUTHOR "alex1701c")
 set(CMAKE_PROJECT_AUTHOR_EMAIL "alex1701c.dev@gmx.net")
