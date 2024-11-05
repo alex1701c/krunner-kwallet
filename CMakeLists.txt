@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(KWalletRunner)
+project(kwallet)
+set(CMAKE_PROJECT_VERSION "1.1.0")
+set(CMAKE_PROJECT_HOMEPAGE_URL "https://github.com/alex1701c/JetBrainsRunner")
+set(CMAKE_PROJECT_AUTHOR "alex1701c")
+set(CMAKE_PROJECT_AUTHOR_EMAIL "alex1701c.dev@gmx.net")
 
 set(QT_MIN_VERSION 5.15.0)
 set(KF_MIN_VERSION 5.105.0)
@@ -37,14 +41,23 @@ add_subdirectory(src)
 
 # CPack configuration
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A Krunner Plugin which allows you to copy and edit kwallet entries")
-set(CPACK_PACKAGE_NAME krunner-kwallet)
-set(CPACK_PACKAGE_VERSION "1.0.0")
-set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "alex1701c")
-set(CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
-SET(CPACK_GENERATOR "DEB;RPM")
-# KUbuntu 18.04 dependencies
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "kwalletmanager, plasma-workspace (>= 5.12)")
-set(CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
-set(CPACK_RPM_PACKAGE_REQUIRES "kwalletmanager plasma-workspace >= 5.12")
-include(CPack)
+set(KRUNNER_VERSION "${KF${QT_MAJOR_VERSION}Runner_VERSION}")
+set(CPACK_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_OS}-plasma${QT_MAJOR_VERSION})
+
+if(CPACK_OS STREQUAL "ubuntu")
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libkf${QT_MAJOR_VERSION}runner${QT_MAJOR_VERSION} (>=${KRUNNER_VERSION})")
+	set(CPACK_GENERATOR "DEB")
+elseif(CPACK_OS STREQUAL "opensuse" AND QT_MAJOR_VERSION STREQUAL 5)
+	set(CPACK_RPM_PACKAGE_REQUIRES "libKF5Runner5 >= ${KRUNNER_VERSION}")
+	set(CPACK_GENERATOR "RPM")
+elseif(CPACK_OS STREQUAL "fedora" OR CPACK_OS STREQUAL "opensuse")
+	set(CPACK_RPM_PACKAGE_REQUIRES "kf${QT_MAJOR_VERSION}-krunner >= ${KRUNNER_VERSION}")
+	set(CPACK_GENERATOR "RPM")
+else()
+  unset(CPACK_PACKAGE_FILE_NAME)
+endif()
+
+# These scripts will kill krunner and when it is invoked next time the plugins will be loaded
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst;${CMAKE_CURRENT_SOURCE_DIR}/postrm")
+set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
+set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postrm")

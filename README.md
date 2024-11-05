@@ -4,27 +4,53 @@ This plugin allows you to copy/show/add/edit passwords from KWallet.
 
 This is a fork from https://github.com/jimtendo/kwallet-runner but has extra features added and deprecated code removed.  
 
-Required Dependencies (Qt5)
-----------------------
+### Required Dependencies
 
-Debian/Ubuntu:  
-`sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext libkf5wallet-dev`  
+<details>
+<summary><b>Debian/Ubuntu</b></summary>
 
-openSUSE  
-`sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-qtlocation-devel ki18n-devel ktextwidgets-devel kservice-devel krunner-devel gettext-tools kconfigwidgets-devel kwallet-devel`  
+Plasma5:  
+```bash install-ubuntu-plasma5
+sudo apt install git cmake extra-cmake-modules build-essential libkf5runner-dev libkf5i18n-dev libkf5kcmutils-dev libkf5notifications-dev libkf5wallet-dev libkf5dbusaddons-bin
+```
+Plasma6:  
+```bash install-ubuntu-plasma6
+sudo apt install git cmake extra-cmake-modules build-essential libkf6runner-dev libkf6i18n-dev libkf6kcmutils-dev libkf6notifications-dev libkf6wallet-dev libkf6dbusaddons-bin
+```
 
-Fedora  
-`sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext kf5-kwallet-devel`  
+</details>
 
-Arch (Manjaro):  
-`sudo pacman -S cmake extra-cmake-modules kwallet`
+<details>
+<summary><b>OpenSUSE</b></summary>
+
+Plasma5:  
+```bash install-opensuse-plasma5
+sudo zypper install git cmake extra-cmake-modules ki18n-devel krunner-devel kcmutils-devel knotifications-devel kwallet-devel kdbusaddons-tools libQt5Test-devel
+```
+Plasma6:  
+```bash install-opensuse-plasma6
+sudo zypper install git cmake kf6-extra-cmake-modules kf6-ki18n-devel kf6-krunner-devel kf6-kcmutils-devel kf6-knotifications-devel kf6-kwallet-devel kf6-kdbusaddons-tools qt6-test-devel
+```
+
+</details>
+
+<details>
+<summary><b>Fedora</b></summary>
+
+Plasma5:  
+```bash install-fedora-plasma5
+sudo dnf install git cmake extra-cmake-modules kf5-ki18n-devel kf5-krunner-devel kf5-kcmutils-devel kf5-knotifications-devel kf5-kwallet-devel
+```
+Plasma6:  
+```bash install-fedora-plasma6
+sudo dnf install git cmake extra-cmake-modules kf6-ki18n-devel kf6-krunner-devel kf6-kcmutils-devel kf6-knotifications-devel kf6-kwallet-devel
+```
+
+</details>
 
 The easiest way to install is:  
 `curl https://raw.githubusercontent.com/alex1701c/krunner-kwallet/master/install.sh | bash`  
-
-You may also 
-
-Restart krunner to load the runner (in a terminal type: kquitapp5 krunner;kstart5 krunner )
+Or you may clone the repo manually and run the script.
 
 ### Screenshots  
 You can search for entries and copy the password (default action), 
