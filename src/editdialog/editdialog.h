@@ -44,7 +44,7 @@ public:
 
     bool init(EditDialogData *data);
 
-private slots:
+private Q_SLOTS:
     void validateSave();
     void validateEntryExists();
     void saveEntry();

@@ -45,7 +45,7 @@ public:
     QLineEdit *createDisplayLine(const QString &text);
     QLabel *createLabel(const QString &text);
 
-private slots:
+private Q_SLOTS:
     void copyToClipboard();
 
 private:
