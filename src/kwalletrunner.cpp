@@ -51,7 +51,9 @@ void KWalletRunner::match(KRunner::RunnerContext &context)
     // Make sure command starts with "kwallet"
     if (query.startsWith(searchString) || query.startsWith(shortSearchString)) {
         const QString searchTerm = query.split(QChar(' '), Qt::SkipEmptyParts).at(1);
-        for (const QString &folderName : wallet->folderList()) {
+        QStringList folders = wallet->folderList();
+        folders.removeDuplicates();
+        for (const QString &folderName : folders) {
             wallet->setFolder(folderName);
             for (const QString &entryName : wallet->entryList()) {
                 if (entryName.contains(searchTerm, Qt::CaseInsensitive)) {
